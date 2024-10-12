@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bilingual Nutrition Calculator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        /* Reset CSS */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            direction: ltr; /* Default text direction */
+        }
+
+        .calculator {
+            background: #fff;
+            padding: 30px 40px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .calculator h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            text-align: center;
+            color: #4a90e2;
+        }
+
+        .calculator label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        .calculator input {
+            width: 100%;
+            padding: 12px 15px;
+            margin-top: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .calculator input:focus {
+            border-color: #4a90e2;
+            outline: none;
+        }
+
+        .calculator button {
+            width: 100%;
+            padding: 15px;
+            margin-top: 25px;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .calculator button:hover {
+            background-color: #357ABD;
+        }
+
+        .result {
+            margin-top: 30px;
+            font-size: 1.5em;
+            text-align: center;
+            color: #4a90e2;
+        }
+
+        /* Language-specific styles */
+        .rtl {
+            direction: rtl;
+            text-align: right;
+        }
+
+        .ltr {
+            direction: ltr;
+            text-align: left;
+        }
+
+        @media (max-width: 600px) {
+            .calculator {
+                padding: 20px 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="calculator" id="calculator">
+    <!-- Language Selection -->
+    <select id="languageSelect" onchange="changeLanguage()" style="margin-bottom: 20px; font-size: 16px; padding: 8px;">
+        <option value="en">English</option>
+        <option value="he">עברית</option>
+    </select>
+
+    <h2 id="title">Nutrition Calculator</h2>
+
+    <label for="carbs" id="carbsLabel">Carbs (g):</label>
+    <input type="number" id="carbs" placeholder="Enter carbs in grams">
+
+    <label for="fibers" id="fibersLabel">Fibers (g):</label>
+    <input type="number" id="fibers" placeholder="Enter fibers in grams">
+
+    <label for="fats" id="fatsLabel">Fats (g):</label>
+    <input type="number" id="fats" placeholder="Enter fats in grams">
+
+    <label for="protein" id="proteinLabel">Protein (g):</label>
+    <input type="number" id="protein" placeholder="Enter protein in grams">
+
+    <label for="amount" id="amountLabel">Amount (g):</label>
+    <input type="number" id="amount" placeholder="Enter total amount in grams" value="100">
+
+    <button onclick="calculate()" id="calculateBtn">Calculate</button>
+
+    <div class="result" id="result"></div>
+</div>
+
+<script>
+    // Language data
+    const languageData = {
+        en: {
+            title: "Nutrition Calculator",
+            carbsLabel: "Carbs (g):",
+            carbsPlaceholder: "Enter carbs in grams",
+            fibersLabel: "Fibers (g):",
+            fibersPlaceholder: "Enter fibers in grams",
+            fatsLabel: "Fats (g):",
+            fatsPlaceholder: "Enter fats in grams",
+            proteinLabel: "Protein (g):",
+            proteinPlaceholder: "Enter protein in grams",
+            amountLabel: "Amount (g):",
+            amountPlaceholder: "Enter total amount in grams",
+            calculateBtn: "Calculate",
+            resultText: "Result: ",
+            direction: "ltr",
+            alignment: "left"
+        },
+        he: {
+            title: "מחשבון תזונה",
+            carbsLabel: "פחמימות (גרם):",
+            carbsPlaceholder: "הזן פחמימות בגרמים",
+            fibersLabel: "סיבים (גרם):",
+            fibersPlaceholder: "הזן סיבים בגרמים",
+            fatsLabel: "שומנים (גרם):",
+            fatsPlaceholder: "הזן שומנים בגרמים",
+            proteinLabel: "חלבון (גרם):",
+            proteinPlaceholder: "הזן חלבון בגרמים",
+            amountLabel: "כמות (גרם):",
+            amountPlaceholder: "הזן כמות כוללת בגרמים",
+            calculateBtn: "חשב",
+            resultText: "תוצאה: ",
+            direction: "rtl",
+            alignment: "right"
+        }
+    };
+
+    // Set default language to English
+    let currentLanguage = 'en';
+
+    // Function to change language
+    function changeLanguage() {
+        currentLanguage = document.getElementById('languageSelect').value;
+        const langData = languageData[currentLanguage];
+
+        // Update text direction and alignment
+        document.body.style.direction = langData.direction;
+        document.getElementById('calculator').className = langData.direction === 'rtl' ? 'calculator rtl' : 'calculator ltr';
+
+        // Update labels and placeholders
+        document.getElementById('title').innerText = langData.title;
+        document.getElementById('carbsLabel').innerText = langData.carbsLabel;
+        document.getElementById('carbs').placeholder = langData.carbsPlaceholder;
+        document.getElementById('fibersLabel').innerText = langData.fibersLabel;
+        document.getElementById('fibers').placeholder = langData.fibersPlaceholder;
+        document.getElementById('fatsLabel').innerText = langData.fatsLabel;
+        document.getElementById('fats').placeholder = langData.fatsPlaceholder;
+        document.getElementById('proteinLabel').innerText = langData.proteinLabel;
+        document.getElementById('protein').placeholder = langData.proteinPlaceholder;
+        document.getElementById('amountLabel').innerText = langData.amountLabel;
+        document.getElementById('amount').placeholder = langData.amountPlaceholder;
+        document.getElementById('calculateBtn').innerText = langData.calculateBtn;
+
+        // Clear result
+        document.getElementById('result').innerText = '';
+    }
+
+    // Function to calculate result
+    function calculate() {
+        let carbs = parseFloat(document.getElementById('carbs').value) || 0;
+        let fibers = parseFloat(document.getElementById('fibers').value) || 0;
+        let fats = parseFloat(document.getElementById('fats').value) || 0;
+        let protein = parseFloat(document.getElementById('protein').value) || 0;
+        let amount = parseFloat(document.getElementById('amount').value) || 0;
+
+        // Calculation with precision up to one decimal place
+        let calculation = (((fats / 3.880) + (carbs / 9.2105) + (protein / 10.9375) - (fibers / 12.5)) * amount) / 100;
+        let result = calculation.toFixed(1);
+
+        // Display result with appropriate label
+        const resultText = languageData[currentLanguage].resultText + result;
+        document.getElementById('result').innerText = resultText;
+    }
+
+    // Initialize language on page load
+    window.onload = function() {
+        changeLanguage();
+    };
+</script>
+
+</body>
+</html>
