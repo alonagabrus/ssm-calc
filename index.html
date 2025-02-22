@@ -152,6 +152,50 @@
     @media (max-width: 600px) {
       .container { padding: 20px 25px; }
     }
+    /* Modal Styles for Export Options */
+    .modal {
+      display: none; /* Hidden by default */
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.4);
+    }
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 90%;
+      max-width: 500px;
+      border-radius: 10px;
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .close:hover, .close:focus {
+      color: black;
+      text-decoration: none;
+    }
+    /* Modal inner elements */
+    #exportModal div { margin-bottom: 15px; }
+    #exportModal input[type="date"] {
+      width: calc(100% - 20px);
+      margin: 5px 0;
+    }
+    #exportModal button {
+      width: auto;
+      padding: 8px 12px;
+      margin: 5px;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
@@ -194,7 +238,8 @@
       <!-- Date Selection & Export Controls -->
       <div class="diary-controls">
         <input type="date" id="diaryDate" onchange="renderDiaryForSelectedDate()">
-        <button onclick="exportDiaryData()" id="exportDataBtn">Export Data</button>
+        <!-- Instead of immediate export, show export modal -->
+        <button onclick="showExportModal()" id="exportDataBtn">Export Data</button>
       </div>
       <!-- Entry Input -->
       <div>
@@ -208,8 +253,32 @@
     </div>
   </div>
 
+  <!-- Export Modal -->
+  <div id="exportModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeExportModal()">&times;</span>
+      <h2 id="exportModalTitle">Export Report</h2>
+      <div>
+        <label><input type="radio" name="exportType" value="single" checked> Single Day</label>
+        <label><input type="radio" name="exportType" value="range"> Date Range</label>
+      </div>
+      <div id="singleExportSection">
+        <input type="date" id="exportSingleDate">
+        <button onclick="setExportDateShortcut('today')">Today</button>
+        <button onclick="setExportDateShortcut('yesterday')">Yesterday</button>
+      </div>
+      <div id="rangeExportSection" style="display:none;">
+        <label>Start Date:</label>
+        <input type="date" id="exportStartDate">
+        <label>End Date:</label>
+        <input type="date" id="exportEndDate">
+      </div>
+      <button onclick="generateExportReport()">Generate Report</button>
+    </div>
+  </div>
+
   <script>
-    // Language Data (Extended for Diary)
+    // Language Data (Extended for Diary & Detailed Export Report)
     const languageData = {
       en: {
         title: "Nutrition Calculator",
@@ -231,7 +300,12 @@
         addEntryBtn: "Add Entry",
         exportDataBtn: "Export Data",
         deleteBtn: "Delete",
-        alertMissingEntry: "Please enter both food and points."
+        alertMissingEntry: "Please enter both food and points.",
+        exportReportTitle: "Diary Export",
+        exportReportTimeLabel: "Time",
+        exportReportFoodLabel: "Food",
+        exportReportPointsLabel: "Points",
+        exportReportTotalLabel: "Total Points"
       },
       he: {
         title: "מחשבון תזונה",
@@ -253,7 +327,12 @@
         addEntryBtn: "הוסף רשומה",
         exportDataBtn: "ייצא נתונים",
         deleteBtn: "מחק",
-        alertMissingEntry: "אנא הזן פריט מזון ונקודות."
+        alertMissingEntry: "אנא הזן פריט מזון ונקודות.",
+        exportReportTitle: "דוח יומן מזון",
+        exportReportTimeLabel: "שעה",
+        exportReportFoodLabel: "פריט מזון",
+        exportReportPointsLabel: "נקודות",
+        exportReportTotalLabel: "סך הכל"
       }
     };
 
@@ -292,6 +371,7 @@
       document.getElementById('foodPoints').placeholder = langData.pointsPlaceholder;
       document.getElementById('addEntryBtn').innerText = langData.addEntryBtn;
       document.getElementById('exportDataBtn').innerText = langData.exportDataBtn;
+      document.getElementById('exportModalTitle').innerText = langData.exportReportTitle;
 
       renderDiaryForSelectedDate();
     }
@@ -366,65 +446,114 @@
       renderDiaryForSelectedDate();
     }
 
-    // --- Export as Image ---
-    // Build a styled table from diary data and convert it to an image.
-    function exportDiaryData() {
-      const exportData = {};
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key.startsWith("diary-")) {
-          exportData[key] = JSON.parse(localStorage.getItem(key));
-        }
-      }
-      exportDiaryDataAsImage(exportData, "diary_data_manual_export.png");
-    }
-    // Automatic export for past days (only once per day per key)
-    function autoExportDiaryData() {
+    // --- Export Modal Functions ---
+    function showExportModal() {
+      document.getElementById("exportModal").style.display = "block";
+      // Set default values for export inputs.
       const today = new Date().toISOString().split('T')[0];
-      let keysToExport = [];
+      document.getElementById("exportSingleDate").value = today;
+      document.getElementById("exportStartDate").value = today;
+      document.getElementById("exportEndDate").value = today;
+    }
+    function closeExportModal() {
+      document.getElementById("exportModal").style.display = "none";
+    }
+    function setExportDateShortcut(shortcut) {
+      const todayDate = new Date();
+      let date;
+      if (shortcut === 'today') {
+        date = todayDate;
+      } else if (shortcut === 'yesterday') {
+        date = new Date(todayDate.getTime() - 24*60*60*1000);
+      }
+      const dateStr = date.toISOString().split('T')[0];
+      document.getElementById("exportSingleDate").value = dateStr;
+    }
+    // Toggle export section based on radio selection
+    document.querySelectorAll('input[name="exportType"]').forEach(radio => {
+      radio.addEventListener('change', function() {
+        if (this.value === 'single') {
+          document.getElementById("singleExportSection").style.display = "block";
+          document.getElementById("rangeExportSection").style.display = "none";
+        } else {
+          document.getElementById("singleExportSection").style.display = "none";
+          document.getElementById("rangeExportSection").style.display = "block";
+        }
+      });
+    });
+
+    // Generate the export report image with detailed entries and daily summary.
+    function generateExportReport() {
+      const exportType = document.querySelector('input[name="exportType"]:checked').value;
+      let startDate, endDate;
+      if (exportType === 'single') {
+        startDate = document.getElementById("exportSingleDate").value;
+        endDate = startDate;
+      } else {
+        startDate = document.getElementById("exportStartDate").value;
+        endDate = document.getElementById("exportEndDate").value;
+      }
+      if (startDate > endDate) {
+        alert("Start date cannot be after end date.");
+        return;
+      }
+      // Collect detailed diary data for dates within the range.
+      const detailedData = {};
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if (key.startsWith("diary-")) {
           const datePart = key.substring("diary-".length);
-          if (datePart < today && !localStorage.getItem("exported-" + key)) {
-            keysToExport.push(key);
+          if (datePart >= startDate && datePart <= endDate) {
+            let diary = JSON.parse(localStorage.getItem(key)) || [];
+            // Only include if there are entries.
+            if(diary.length > 0) {
+              detailedData[datePart] = diary;
+            }
           }
         }
       }
-      if (keysToExport.length > 0) {
-        const exportData = {};
-        keysToExport.forEach(key => {
-          exportData[key] = JSON.parse(localStorage.getItem(key));
-          localStorage.setItem("exported-" + key, "true");
-        });
-        exportDiaryDataAsImage(exportData, "diary_data_auto_export.png");
+      // Determine if RTL should be applied.
+      const isRTL = (currentLanguage === 'he');
+      let containerStyle = "font-family: Arial, sans-serif; padding: 20px;";
+      if(isRTL) {
+        containerStyle += " direction: rtl; text-align: right;";
       }
-    }
-    // Build a styled table from exportData, convert it to an image, and download it.
-    function exportDiaryDataAsImage(exportData, filename) {
-      let html = "<div style='font-family: Arial, sans-serif; padding: 20px;'>";
-      html += "<h2 style='text-align:center; margin-bottom:20px;'>Diary Export</h2>";
-      html += "<table style='width:100%; border-collapse: collapse;'>";
-      html += "<thead><tr style='background:#4a90e2; color:#fff;'>";
-      html += "<th style='border: 1px solid #ddd; padding:8px;'>Date</th>";
-      html += "<th style='border: 1px solid #ddd; padding:8px;'>Time</th>";
-      html += "<th style='border: 1px solid #ddd; padding:8px;'>Food</th>";
-      html += "<th style='border: 1px solid #ddd; padding:8px;'>Points</th>";
-      html += "</tr></thead><tbody>";
-      const keys = Object.keys(exportData).sort();
-      keys.forEach(key => {
-        const date = key.replace("diary-", "");
-        const diary = exportData[key];
-        diary.forEach(entry => {
+      // Build the HTML report.
+      let html = "<div style='" + containerStyle + "'>";
+      html += "<h2 style='text-align:center; margin-bottom:20px;'>" 
+            + languageData[currentLanguage].exportReportTitle 
+            + " (" + startDate + " - " + endDate + ")</h2>";
+      
+      // Process each date in sorted order.
+      Object.keys(detailedData).sort().forEach(date => {
+        const entries = detailedData[date];
+        html += "<h3 style='margin-top:20px; text-align:center;'>" + date + "</h3>";
+        html += "<table style='width:100%; border-collapse: collapse; margin-bottom:20px;'>";
+        // Table header for details.
+        html += "<thead><tr style='background:#4a90e2; color:#fff;'>";
+        html += "<th style='border: 1px solid #ddd; padding:8px;'>" + languageData[currentLanguage].exportReportTimeLabel + "</th>";
+        html += "<th style='border: 1px solid #ddd; padding:8px;'>" + languageData[currentLanguage].exportReportFoodLabel + "</th>";
+        html += "<th style='border: 1px solid #ddd; padding:8px;'>" + languageData[currentLanguage].exportReportPointsLabel + "</th>";
+        html += "</tr></thead><tbody>";
+        let totalPoints = 0;
+        entries.forEach(entry => {
           html += "<tr>";
-          html += "<td style='border: 1px solid #ddd; padding:8px;'>" + date + "</td>";
           html += "<td style='border: 1px solid #ddd; padding:8px;'>" + entry.time + "</td>";
           html += "<td style='border: 1px solid #ddd; padding:8px;'>" + entry.food + "</td>";
-          html += "<td style='border: 1px solid #ddd; padding:8px;'>" + entry.points + "</td>";
+          const pointsVal = parseFloat(entry.points) || 0;
+          html += "<td style='border: 1px solid #ddd; padding:8px; text-align:right;'>" + pointsVal.toFixed(1) + "</td>";
           html += "</tr>";
+          totalPoints += pointsVal;
         });
+        // Summary row for the day.
+        html += "<tr style='font-weight:bold; background:#f0f0f0;'>";
+        html += "<td style='border: 1px solid #ddd; padding:8px;' colspan='2'>" + languageData[currentLanguage].exportReportTotalLabel + "</td>";
+        html += "<td style='border: 1px solid #ddd; padding:8px; text-align:right;'>" + totalPoints.toFixed(1) + "</td>";
+        html += "</tr>";
+        html += "</tbody></table>";
       });
-      html += "</tbody></table></div>";
+      
+      html += "</div>";
 
       // Create an off-screen container for the table.
       const tempDiv = document.createElement("div");
@@ -433,22 +562,22 @@
       tempDiv.innerHTML = html;
       document.body.appendChild(tempDiv);
       
-      // Use html2canvas to convert the table into a canvas, then download the image.
+      // Convert the container to an image using html2canvas and trigger download.
       html2canvas(tempDiv).then(function(canvas) {
         const dataURL = canvas.toDataURL("image/png");
         const downloadAnchor = document.createElement("a");
         downloadAnchor.style.display = "none";
         downloadAnchor.setAttribute("href", dataURL);
+        const filename = "diary_export_" + startDate + "_to_" + endDate + ".png";
         downloadAnchor.setAttribute("download", filename);
         document.body.appendChild(downloadAnchor);
         downloadAnchor.click();
         downloadAnchor.remove();
         document.body.removeChild(tempDiv);
+        closeExportModal();
       });
     }
-    // Check for auto-export every minute.
-    setInterval(autoExportDiaryData, 60000);
-    
+
     window.onload = function() {
       setDefaultDiaryDate();
       changeLanguage();
