@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bilingual Nutrition Calculator & Diary</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Include html2canvas from CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    /* Reset & Base Styles */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+      color: #333;
+      min-height: 100vh;
+      padding: 20px;
+      direction: ltr;
+    }
+    /* Language selector */
+    #languageSelect {
+      margin-bottom: 20px;
+      font-size: 16px;
+      padding: 8px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    /* Tab Navigation */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .tab-button {
+      flex: 1;
+      padding: 12px 20px;
+      background-color: #e0e0e0;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+    .tab-button.active {
+      background-color: #4a90e2;
+      color: #fff;
+    }
+    .tab-button:hover:not(.active) {
+      background-color: #d0d0d0;
+    }
+    /* Tab Content Container */
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    /* Shared Container Styles */
+    .container {
+      background: #fff;
+      padding: 30px 40px;
+      border-radius: 10px;
+      max-width: 500px;
+      margin: 0 auto 40px auto;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    h2, h3 { 
+      text-align: center; 
+      color: #4a90e2; 
+      margin-bottom: 20px; 
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input[type="number"],
+    input[type="text"],
+    input[type="date"] {
+      width: 100%;
+      padding: 12px 15px;
+      margin-top: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+    input:focus {
+      border-color: #4a90e2;
+      outline: none;
+    }
+    button {
+      width: 100%;
+      padding: 15px;
+      margin-top: 25px;
+      background-color: #4a90e2;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #357ABD;
+    }
+    .result {
+      margin-top: 30px;
+      font-size: 1.5em;
+      text-align: center;
+      color: #4a90e2;
+    }
+    /* Diary Specific Styles */
+    .diary-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .diary-controls input[type="date"] {
+      padding: 8px;
+      font-size: 16px;
+      width: 48%;
+    }
+    .diary-controls button {
+      width: 48%;
+      padding: 10px;
+      font-size: 16px;
+      margin-top: 0;
+    }
+    .diary-list {
+      margin-top: 15px;
+      list-style: none;
+      padding: 0;
+    }
+    .diary-list li {
+      margin: 5px 0;
+      display: flex;
+      justify-content: space-between;
+      background: #f9f9f9;
+      padding: 8px 10px;
+      border-radius: 5px;
+    }
+    .diary-list li button {
+      background-color: #e74c3c;
+      border: none;
+      color: #fff;
+      padding: 5px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    @media (max-width: 600px) {
+      .container { padding: 20px 25px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Language Selector -->
+  <select id="languageSelect" onchange="changeLanguage()">
+    <option value="en">English</option>
+    <option value="he">עברית</option>
+  </select>
+
+  <!-- Tab Navigation -->
+  <div class="tabs">
+    <button class="tab-button active" onclick="showTab('calculatorTab')">Calculator</button>
+    <button class="tab-button" onclick="showTab('diaryTab')">Diary</button>
+  </div>
+
+  <!-- Calculator Tab -->
+  <div id="calculatorTab" class="tab-content active">
+    <div class="container" id="calculator">
+      <h2 id="title">Nutrition Calculator</h2>
+      <label for="carbs" id="carbsLabel">Carbs (g):</label>
+      <input type="number" id="carbs" placeholder="Enter carbs in grams">
+      <label for="fibers" id="fibersLabel">Fibers (g):</label>
+      <input type="number" id="fibers" placeholder="Enter fibers in grams">
+      <label for="fats" id="fatsLabel">Fats (g):</label>
+      <input type="number" id="fats" placeholder="Enter fats in grams">
+      <label for="protein" id="proteinLabel">Protein (g):</label>
+      <input type="number" id="protein" placeholder="Enter protein in grams">
+      <label for="amount" id="amountLabel">Amount (g):</label>
+      <input type="number" id="amount" placeholder="Enter total amount in grams" value="100">
+      <button onclick="calculate()" id="calculateBtn">Calculate</button>
+      <div class="result" id="result"></div>
+    </div>
+  </div>
+
+  <!-- Diary Tab -->
+  <div id="diaryTab" class="tab-content">
+    <div class="container" id="foodDiary">
+      <h3 id="diaryTitle">Food Diary</h3>
+      <!-- Date Selection & Export Controls -->
+      <div class="diary-controls">
+        <input type="date" id="diaryDate" onchange="renderDiaryForSelectedDate()">
+        <button onclick="exportDiaryData()" id="exportDataBtn">Export Data</button>
+      </div>
+      <!-- Entry Input -->
+      <div>
+        <input type="text" id="foodName" placeholder="Enter food item">
+        <input type="number" id="foodPoints" placeholder="Points">
+      </div>
+      <div>
+        <button onclick="addDiaryEntry()" id="addEntryBtn">Add Entry</button>
+      </div>
+      <ul class="diary-list" id="diaryList"></ul>
+    </div>
+  </div>
+
+  <script>
+    // Language Data (Extended for Diary)
+    const languageData = {
+      en: {
+        title: "Nutrition Calculator",
+        carbsLabel: "Carbs (g):",
+        carbsPlaceholder: "Enter carbs in grams",
+        fibersLabel: "Fibers (g):",
+        fibersPlaceholder: "Enter fibers in grams",
+        fatsLabel: "Fats (g):",
+        fatsPlaceholder: "Enter fats in grams",
+        proteinLabel: "Protein (g):",
+        proteinPlaceholder: "Enter protein in grams",
+        amountLabel: "Amount (g):",
+        amountPlaceholder: "Enter total amount in grams",
+        calculateBtn: "Calculate",
+        resultText: "Result: ",
+        diaryTitle: "Food Diary",
+        foodPlaceholder: "Enter food item",
+        pointsPlaceholder: "Points",
+        addEntryBtn: "Add Entry",
+        exportDataBtn: "Export Data",
+        deleteBtn: "Delete",
+        alertMissingEntry: "Please enter both food and points."
+      },
+      he: {
+        title: "מחשבון תזונה",
+        carbsLabel: "פחמימות (גרם):",
+        carbsPlaceholder: "הזן פחמימות בגרמים",
+        fibersLabel: "סיבים (גרם):",
+        fibersPlaceholder: "הזן סיבים בגרמים",
+        fatsLabel: "שומנים (גרם):",
+        fatsPlaceholder: "הזן שומנים בגרמים",
+        proteinLabel: "חלבון (גרם):",
+        proteinPlaceholder: "הזן חלבון בגרמים",
+        amountLabel: "כמות (גרם):",
+        amountPlaceholder: "הזן כמות כוללת בגרמים",
+        calculateBtn: "חשב",
+        resultText: "תוצאה: ",
+        diaryTitle: "יומן מזון",
+        foodPlaceholder: "הזן פריט מזון",
+        pointsPlaceholder: "נקודות",
+        addEntryBtn: "הוסף רשומה",
+        exportDataBtn: "ייצא נתונים",
+        deleteBtn: "מחק",
+        alertMissingEntry: "אנא הזן פריט מזון ונקודות."
+      }
+    };
+
+    let currentLanguage = 'en';
+
+    // Set default diary date to today
+    function setDefaultDiaryDate() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('diaryDate').value = today;
+    }
+
+    // Change Language & Update UI Texts
+    function changeLanguage() {
+      currentLanguage = document.getElementById('languageSelect').value;
+      const langData = languageData[currentLanguage];
+      document.body.style.direction = langData.direction || "ltr";
+
+      // Update Calculator texts
+      document.getElementById('title').innerText = langData.title;
+      document.getElementById('carbsLabel').innerText = langData.carbsLabel;
+      document.getElementById('carbs').placeholder = langData.carbsPlaceholder;
+      document.getElementById('fibersLabel').innerText = langData.fibersLabel;
+      document.getElementById('fibers').placeholder = langData.fibersPlaceholder;
+      document.getElementById('fatsLabel').innerText = langData.fatsLabel;
+      document.getElementById('fats').placeholder = langData.fatsPlaceholder;
+      document.getElementById('proteinLabel').innerText = langData.proteinLabel;
+      document.getElementById('protein').placeholder = langData.proteinPlaceholder;
+      document.getElementById('amountLabel').innerText = langData.amountLabel;
+      document.getElementById('amount').placeholder = langData.amountPlaceholder;
+      document.getElementById('calculateBtn').innerText = langData.calculateBtn;
+      document.getElementById('result').innerText = '';
+
+      // Update Diary texts
+      document.getElementById('diaryTitle').innerText = langData.diaryTitle;
+      document.getElementById('foodName').placeholder = langData.foodPlaceholder;
+      document.getElementById('foodPoints').placeholder = langData.pointsPlaceholder;
+      document.getElementById('addEntryBtn').innerText = langData.addEntryBtn;
+      document.getElementById('exportDataBtn').innerText = langData.exportDataBtn;
+
+      renderDiaryForSelectedDate();
+    }
+
+    // Tab Switching
+    function showTab(tabId) {
+      const tabs = document.getElementsByClassName('tab-content');
+      for (let tab of tabs) { tab.classList.remove('active'); }
+      const buttons = document.getElementsByClassName('tab-button');
+      for (let btn of buttons) { btn.classList.remove('active'); }
+      document.getElementById(tabId).classList.add('active');
+      if(tabId === 'calculatorTab'){
+        buttons[0].classList.add('active');
+      } else {
+        buttons[1].classList.add('active');
+      }
+    }
+
+    // Calculator function
+    function calculate() {
+      const carbs = parseFloat(document.getElementById('carbs').value) || 0;
+      const fibers = parseFloat(document.getElementById('fibers').value) || 0;
+      const fats = parseFloat(document.getElementById('fats').value) || 0;
+      const protein = parseFloat(document.getElementById('protein').value) || 0;
+      const amount = parseFloat(document.getElementById('amount').value) || 0;
+      const calculation = (((fats / 3.880) + (carbs / 9.2105) + (protein / 10.9375) - (fibers / 12.5)) * amount) / 100;
+      const result = calculation.toFixed(1);
+      document.getElementById('result').innerText = languageData[currentLanguage].resultText + result;
+    }
+
+    // Diary: localStorage key: "diary-YYYY-MM-DD"
+    function getDiaryKey(dateStr) {
+      return "diary-" + dateStr;
+    }
+    function addDiaryEntry() {
+      const food = document.getElementById('foodName').value.trim();
+      const points = document.getElementById('foodPoints').value.trim();
+      if (!food || !points) {
+        alert(languageData[currentLanguage].alertMissingEntry);
+        return;
+      }
+      const diaryDate = document.getElementById('diaryDate').value || new Date().toISOString().split('T')[0];
+      const entry = { food: food, points: points, time: new Date().toLocaleTimeString() };
+      const key = getDiaryKey(diaryDate);
+      let diary = JSON.parse(localStorage.getItem(key)) || [];
+      diary.push(entry);
+      localStorage.setItem(key, JSON.stringify(diary));
+      renderDiaryForSelectedDate();
+      document.getElementById('foodName').value = '';
+      document.getElementById('foodPoints').value = '';
+    }
+    function renderDiaryForSelectedDate() {
+      const diaryDate = document.getElementById('diaryDate').value || new Date().toISOString().split('T')[0];
+      const key = getDiaryKey(diaryDate);
+      let diary = JSON.parse(localStorage.getItem(key)) || [];
+      const diaryList = document.getElementById('diaryList');
+      diaryList.innerHTML = '';
+      diary.forEach((entry, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span>${entry.time} - ${entry.food}: ${entry.points}</span>
+                        <button onclick="deleteEntry('${diaryDate}', ${index})">
+                          ${languageData[currentLanguage].deleteBtn || "Delete"}
+                        </button>`;
+        diaryList.appendChild(li);
+      });
+    }
+    function deleteEntry(dateStr, index) {
+      const key = getDiaryKey(dateStr);
+      let diary = JSON.parse(localStorage.getItem(key)) || [];
+      diary.splice(index, 1);
+      localStorage.setItem(key, JSON.stringify(diary));
+      renderDiaryForSelectedDate();
+    }
+
+    // --- Export as Image ---
+    // Build a styled table from diary data and convert it to an image.
+    function exportDiaryData() {
+      const exportData = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith("diary-")) {
+          exportData[key] = JSON.parse(localStorage.getItem(key));
+        }
+      }
+      exportDiaryDataAsImage(exportData, "diary_data_manual_export.png");
+    }
+    // Automatic export for past days (only once per day per key)
+    function autoExportDiaryData() {
+      const today = new Date().toISOString().split('T')[0];
+      let keysToExport = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith("diary-")) {
+          const datePart = key.substring("diary-".length);
+          if (datePart < today && !localStorage.getItem("exported-" + key)) {
+            keysToExport.push(key);
+          }
+        }
+      }
+      if (keysToExport.length > 0) {
+        const exportData = {};
+        keysToExport.forEach(key => {
+          exportData[key] = JSON.parse(localStorage.getItem(key));
+          localStorage.setItem("exported-" + key, "true");
+        });
+        exportDiaryDataAsImage(exportData, "diary_data_auto_export.png");
+      }
+    }
+    // Build a styled table from exportData, convert it to an image, and download it.
+    function exportDiaryDataAsImage(exportData, filename) {
+      let html = "<div style='font-family: Arial, sans-serif; padding: 20px;'>";
+      html += "<h2 style='text-align:center; margin-bottom:20px;'>Diary Export</h2>";
+      html += "<table style='width:100%; border-collapse: collapse;'>";
+      html += "<thead><tr style='background:#4a90e2; color:#fff;'>";
+      html += "<th style='border: 1px solid #ddd; padding:8px;'>Date</th>";
+      html += "<th style='border: 1px solid #ddd; padding:8px;'>Time</th>";
+      html += "<th style='border: 1px solid #ddd; padding:8px;'>Food</th>";
+      html += "<th style='border: 1px solid #ddd; padding:8px;'>Points</th>";
+      html += "</tr></thead><tbody>";
+      const keys = Object.keys(exportData).sort();
+      keys.forEach(key => {
+        const date = key.replace("diary-", "");
+        const diary = exportData[key];
+        diary.forEach(entry => {
+          html += "<tr>";
+          html += "<td style='border: 1px solid #ddd; padding:8px;'>" + date + "</td>";
+          html += "<td style='border: 1px solid #ddd; padding:8px;'>" + entry.time + "</td>";
+          html += "<td style='border: 1px solid #ddd; padding:8px;'>" + entry.food + "</td>";
+          html += "<td style='border: 1px solid #ddd; padding:8px;'>" + entry.points + "</td>";
+          html += "</tr>";
+        });
+      });
+      html += "</tbody></table></div>";
+
+      // Create an off-screen container for the table.
+      const tempDiv = document.createElement("div");
+      tempDiv.style.position = "absolute";
+      tempDiv.style.left = "-10000px";
+      tempDiv.innerHTML = html;
+      document.body.appendChild(tempDiv);
+      
+      // Use html2canvas to convert the table into a canvas, then download the image.
+      html2canvas(tempDiv).then(function(canvas) {
+        const dataURL = canvas.toDataURL("image/png");
+        const downloadAnchor = document.createElement("a");
+        downloadAnchor.style.display = "none";
+        downloadAnchor.setAttribute("href", dataURL);
+        downloadAnchor.setAttribute("download", filename);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+        document.body.removeChild(tempDiv);
+      });
+    }
+    // Check for auto-export every minute.
+    setInterval(autoExportDiaryData, 60000);
+    
+    window.onload = function() {
+      setDefaultDiaryDate();
+      changeLanguage();
+    };
+  </script>
+</body>
+</html>
