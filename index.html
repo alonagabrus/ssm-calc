@@ -1,0 +1,422 @@
+<!-- 
+To run this project locally and avoid CORS issues, use a local HTTP server.
+For example, if you have Python installed, run:
+  python -m http.server
+Then open http://localhost:8000 in your browser.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bilingual Nutrition Calculator & Diary</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Tailwind CSS via CDN for development.
+       For production, install Tailwind as a PostCSS plugin or use the CLI.
+       See: https://tailwindcss.com/docs/installation -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- html2canvas if needed -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-gray-100 to-blue-200 p-5">
+  <!-- Language Selector -->
+  <select id="languageSelect" onchange="changeLanguage()"
+          class="block mx-auto mb-5 p-2 text-base rounded border border-gray-300">
+    <option value="en">English</option>
+    <option value="he">עברית</option>
+  </select>
+
+  <!-- Tab Navigation -->
+  <div class="flex justify-center mb-5">
+    <button class="tab-button flex-1 p-3 bg-gray-300 hover:bg-gray-400 transition-colors"
+            onclick="showTab('calculatorTab')">Calculator</button>
+    <button class="tab-button flex-1 p-3 bg-gray-300 hover:bg-gray-400 transition-colors"
+            onclick="showTab('diaryTab')">Diary</button>
+    <button class="tab-button flex-1 p-3 bg-gray-300 hover:bg-gray-400 transition-colors"
+            onclick="showTab('searchTab')">Search</button>
+  </div>
+
+  <!-- Calculator Tab -->
+  <div id="calculatorTab" class="tab-content">
+    <div id="calculator" class="bg-white p-8 rounded-lg max-w-md mx-auto mb-10 shadow-lg">
+      <h2 id="title" class="text-center text-2xl text-blue-500 mb-5">Nutrition Calculator</h2>
+      <label for="carbs" id="carbsLabel" class="block mt-4 font-semibold">Carbs (g):</label>
+      <input type="number" id="carbs" placeholder="Enter carbs in grams"
+             class="w-full p-3 mt-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500" />
+      <label for="fibers" id="fibersLabel" class="block mt-4 font-semibold">Fibers (g):</label>
+      <input type="number" id="fibers" placeholder="Enter fibers in grams"
+             class="w-full p-3 mt-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500" />
+      <label for="fats" id="fatsLabel" class="block mt-4 font-semibold">Fats (g):</label>
+      <input type="number" id="fats" placeholder="Enter fats in grams"
+             class="w-full p-3 mt-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500" />
+      <label for="protein" id="proteinLabel" class="block mt-4 font-semibold">Protein (g):</label>
+      <input type="number" id="protein" placeholder="Enter protein in grams"
+             class="w-full p-3 mt-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500" />
+      <label for="amount" id="amountLabel" class="block mt-4 font-semibold">Amount (g):</label>
+      <input type="number" id="amount" placeholder="Enter total amount in grams" value="100"
+             class="w-full p-3 mt-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500" />
+      <button id="calculateBtn" onclick="calculate()"
+              class="w-full p-4 mt-6 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
+        Calculate
+      </button>
+      <div id="result" class="result text-center text-2xl text-blue-500 mt-6"></div>
+    </div>
+  </div>
+
+  <!-- Diary Tab -->
+  <div id="diaryTab" class="tab-content hidden">
+    <div id="foodDiary" class="bg-white p-8 rounded-lg max-w-md mx-auto mb-10 shadow-lg">
+      <h3 id="diaryTitle" class="text-center text-2xl text-blue-500 mb-5">Food Diary</h3>
+      <div class="diary-controls flex justify-between items-center mb-4">
+        <input type="date" id="diaryDate" onchange="renderDiaryForSelectedDate()"
+               class="w-1/2 p-2 border border-gray-300 rounded" />
+        <button id="exportDataBtn" onclick="showExportModal()"
+                class="w-1/2 p-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
+          Export Data
+        </button>
+      </div>
+      <div class="mb-4">
+        <input type="text" id="foodName" placeholder="Enter food item"
+               class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-blue-500" />
+      </div>
+      <div class="mb-4">
+        <input type="number" id="foodPoints" placeholder="Points"
+               class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-blue-500" />
+      </div>
+      <button id="addEntryBtn" onclick="addDiaryEntry()"
+              class="w-full p-4 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
+        Add Entry
+      </button>
+      <ul id="diaryList" class="diary-list mt-4 list-none"></ul>
+    </div>
+  </div>
+
+  <!-- Search Tab -->
+  <div id="searchTab" class="tab-content hidden">
+    <div id="searchContainer" class="bg-white p-8 rounded-lg max-w-md mx-auto mb-10 shadow-lg">
+      <h2 class="text-center text-2xl text-blue-500 mb-5">Search Meals</h2>
+      <input type="text" id="searchInput" placeholder="Search meals by name"
+             class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-blue-500" />
+      <div id="searchResults" class="mt-4"></div>
+    </div>
+  </div>
+
+  <!-- Export Modal -->
+  <div id="exportModal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <div class="modal-content bg-white p-6 rounded shadow-lg max-w-md w-full relative">
+      <span class="close absolute top-2 right-2 text-gray-500 text-2xl cursor-pointer" onclick="closeExportModal()">&times;</span>
+      <h2 id="exportModalTitle" class="text-center text-2xl text-blue-500 mb-4">Export Report</h2>
+      <div class="mb-4">
+        <label class="inline-flex items-center mr-4">
+          <input type="radio" name="exportType" value="single" checked class="form-radio" />
+          <span class="ml-2">Single Day</span>
+        </label>
+        <label class="inline-flex items-center">
+          <input type="radio" name="exportType" value="range" class="form-radio" />
+          <span class="ml-2">Date Range</span>
+        </label>
+      </div>
+      <div id="singleExportSection" class="mb-4">
+        <input type="date" id="exportSingleDate" class="w-full p-2 border border-gray-300 rounded mb-2" />
+        <div class="flex space-x-2">
+          <button onclick="setExportDateShortcut('today')"
+                  class="flex-1 p-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
+            Today
+          </button>
+          <button onclick="setExportDateShortcut('yesterday')"
+                  class="flex-1 p-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
+            Yesterday
+          </button>
+        </div>
+      </div>
+      <div id="rangeExportSection" class="mb-4 hidden">
+        <label class="block mb-1">Start Date:</label>
+        <input type="date" id="exportStartDate" class="w-full p-2 border border-gray-300 rounded mb-2" />
+        <label class="block mb-1">End Date:</label>
+        <input type="date" id="exportEndDate" class="w-full p-2 border border-gray-300 rounded" />
+      </div>
+      <button onclick="generateExportReport()"
+              class="w-full p-3 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
+        Generate Report
+      </button>
+    </div>
+  </div>
+
+  <!-- Meal Modal for Search Results -->
+  <div id="mealModal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <div class="modal-content bg-white p-6 rounded shadow-lg max-w-md w-full relative">
+      <span class="close absolute top-2 right-2 text-gray-500 text-2xl cursor-pointer" onclick="closeMealModal()">&times;</span>
+      <h2 id="modalMealName" class="text-center text-2xl text-blue-500 mb-4"></h2>
+      <p class="mb-2">
+        Quantity:
+        <input type="text" id="modalMealQuantity"
+               class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500" />
+      </p>
+      <p class="mb-4">
+        Points:
+        <input type="number" id="modalMealPoints"
+               class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500" />
+      </p>
+      <button onclick="addMealToDiary()"
+              class="w-full p-3 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
+        Add to Diary
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Language Data & Global Variables
+    const languageData = {
+      en: {
+        title: "Nutrition Calculator",
+        carbsLabel: "Carbs (g):",
+        carbsPlaceholder: "Enter carbs in grams",
+        fibersLabel: "Fibers (g):",
+        fibersPlaceholder: "Enter fibers in grams",
+        fatsLabel: "Fats (g):",
+        fatsPlaceholder: "Enter fats in grams",
+        proteinLabel: "Protein (g):",
+        proteinPlaceholder: "Enter protein in grams",
+        amountLabel: "Amount (g):",
+        amountPlaceholder: "Enter total amount in grams",
+        calculateBtn: "Calculate",
+        resultText: "Result: ",
+        diaryTitle: "Food Diary",
+        foodPlaceholder: "Enter food item",
+        pointsPlaceholder: "Points",
+        addEntryBtn: "Add Entry",
+        exportDataBtn: "Export Data",
+        deleteBtn: "Delete",
+        alertMissingEntry: "Please enter both food and points.",
+        exportReportTitle: "Diary Export"
+      },
+      he: {
+        title: "מחשבון תזונה",
+        carbsLabel: "פחמימות (גרם):",
+        carbsPlaceholder: "הזן פחמימות בגרמים",
+        fibersLabel: "סיבים (גרם):",
+        fibersPlaceholder: "הזן סיבים בגרמים",
+        fatsLabel: "שומנים (גרם):",
+        fatsPlaceholder: "הזן שומנים בגרמים",
+        proteinLabel: "חלבון (גרם):",
+        proteinPlaceholder: "הזן חלבון בגרמים",
+        amountLabel: "כמות (גרם):",
+        amountPlaceholder: "הזן כמות כוללת בגרמים",
+        calculateBtn: "חשב",
+        resultText: "תוצאה: ",
+        diaryTitle: "יומן מזון",
+        foodPlaceholder: "הזן פריט מזון",
+        pointsPlaceholder: "נקודות",
+        addEntryBtn: "הוסף רשומה",
+        exportDataBtn: "ייצא נתונים",
+        deleteBtn: "מחק",
+        alertMissingEntry: "אנא הזן פריט מזון ונקודות.",
+        exportReportTitle: "דוח יומן מזון"
+      }
+    };
+    let currentLanguage = 'en';
+    let mealData = [];
+    let currentMeal = null;
+
+    // Load Meal Data from JSON File
+    fetch('data.json')
+      .then(response => response.json())
+      .then(data => { mealData = data; })
+      .catch(err => console.error('Error loading meal data:', err));
+
+    // Tab Switching
+    function showTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+      document.getElementById(tabId).classList.remove('hidden');
+      // Update active button classes
+      document.querySelectorAll('.tab-button').forEach((btn, i) => btn.classList.remove('bg-blue-500','text-white'));
+      if(tabId === 'calculatorTab'){
+        document.querySelectorAll('.tab-button')[0].classList.add('bg-blue-500','text-white');
+      } else if(tabId === 'diaryTab'){
+        document.querySelectorAll('.tab-button')[1].classList.add('bg-blue-500','text-white');
+      } else if(tabId === 'searchTab'){
+        document.querySelectorAll('.tab-button')[2].classList.add('bg-blue-500','text-white');
+      }
+    }
+    // Initially show calculator tab, hide others
+    document.getElementById('calculatorTab').classList.remove('hidden');
+    document.getElementById('diaryTab').classList.add('hidden');
+    document.getElementById('searchTab').classList.add('hidden');
+
+    // Calculator Function
+    function calculate() {
+      const carbs   = parseFloat(document.getElementById('carbs').value) || 0;
+      const fibers  = parseFloat(document.getElementById('fibers').value) || 0;
+      const fats    = parseFloat(document.getElementById('fats').value) || 0;
+      const protein = parseFloat(document.getElementById('protein').value) || 0;
+      const amount  = parseFloat(document.getElementById('amount').value) || 0;
+      const calculation = (((fats / 3.880) + (carbs / 9.2105) + (protein / 10.9375) - (fibers / 12.5)) * amount) / 100;
+      document.getElementById('result').innerText = languageData[currentLanguage].resultText + calculation.toFixed(1);
+    }
+
+    // Diary Functions
+    function getDiaryKey(dateStr) {
+      return "diary-" + dateStr;
+    }
+    function addDiaryEntry() {
+      const food   = document.getElementById('foodName').value.trim();
+      const points = document.getElementById('foodPoints').value.trim();
+      if (!food || !points) {
+        alert(languageData[currentLanguage].alertMissingEntry);
+        return;
+      }
+      const diaryDate = document.getElementById('diaryDate').value || new Date().toISOString().split('T')[0];
+      const entry = { food, points, time: new Date().toLocaleTimeString() };
+      const key = getDiaryKey(diaryDate);
+      const diary = JSON.parse(localStorage.getItem(key)) || [];
+      diary.push(entry);
+      localStorage.setItem(key, JSON.stringify(diary));
+      renderDiaryForSelectedDate();
+      document.getElementById('foodName').value = '';
+      document.getElementById('foodPoints').value = '';
+    }
+    function renderDiaryForSelectedDate() {
+      const diaryDate = document.getElementById('diaryDate').value || new Date().toISOString().split('T')[0];
+      const key = getDiaryKey(diaryDate);
+      const diary = JSON.parse(localStorage.getItem(key)) || [];
+      const diaryList = document.getElementById('diaryList');
+      diaryList.innerHTML = '';
+      diary.forEach((entry, index) => {
+        const li = document.createElement('li');
+        li.className = "flex justify-between bg-gray-100 p-3 rounded mb-2";
+        li.innerHTML = `<span>${entry.time} - ${entry.food}: ${entry.points}</span>
+                        <button onclick="deleteEntry('${diaryDate}', ${index})" class="bg-red-500 text-white px-3 py-1 rounded">
+                          ${languageData[currentLanguage].deleteBtn || "Delete"}
+                        </button>`;
+        diaryList.appendChild(li);
+      });
+    }
+    function deleteEntry(dateStr, index) {
+      const key = getDiaryKey(dateStr);
+      const diary = JSON.parse(localStorage.getItem(key)) || [];
+      diary.splice(index, 1);
+      localStorage.setItem(key, JSON.stringify(diary));
+      renderDiaryForSelectedDate();
+    }
+
+    // Export Modal Functions
+    function showExportModal() {
+      document.getElementById("exportModal").classList.remove("hidden");
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById("exportSingleDate").value = today;
+      document.getElementById("exportStartDate").value = today;
+      document.getElementById("exportEndDate").value = today;
+    }
+    function closeExportModal() {
+      document.getElementById("exportModal").classList.add("hidden");
+    }
+    function setExportDateShortcut(shortcut) {
+      const todayDate = new Date();
+      let date;
+      if (shortcut === 'today') {
+        date = todayDate;
+      } else if (shortcut === 'yesterday') {
+        date = new Date(todayDate.getTime() - 24 * 60 * 60 * 1000);
+      }
+      const dateStr = date.toISOString().split('T')[0];
+      document.getElementById("exportSingleDate").value = dateStr;
+    }
+    function generateExportReport() {
+      alert("Export report functionality is not fully implemented in this demo.");
+      closeExportModal();
+    }
+    document.querySelectorAll('input[name="exportType"]').forEach(radio => {
+      radio.addEventListener('change', function() {
+        if (this.value === 'single') {
+          document.getElementById("singleExportSection").classList.remove("hidden");
+          document.getElementById("rangeExportSection").classList.add("hidden");
+        } else {
+          document.getElementById("singleExportSection").classList.add("hidden");
+          document.getElementById("rangeExportSection").classList.remove("hidden");
+        }
+      });
+    });
+
+    // Search & Autocomplete
+    document.getElementById('searchInput').addEventListener('input', function() {
+      const query = this.value.toLowerCase();
+      const resultsContainer = document.getElementById('searchResults');
+      resultsContainer.innerHTML = '';
+      if (!query) return;
+      const filtered = mealData.filter(meal => meal.name && meal.name.toLowerCase().includes(query));
+      filtered.forEach(meal => {
+        const div = document.createElement('div');
+        div.className = 'search-item p-3 border border-gray-300 rounded mb-2 cursor-pointer bg-white hover:bg-gray-100';
+        div.innerHTML = `<strong>${meal.name}</strong> — ${meal.quantity || ''} — ${meal.points} pts`;
+        div.onclick = () => openMealModal(meal);
+        resultsContainer.appendChild(div);
+      });
+    });
+
+    // Meal Modal Functions
+    function openMealModal(meal) {
+      currentMeal = meal;
+      document.getElementById('modalMealName').innerText = meal.name;
+      document.getElementById('modalMealQuantity').value = meal.quantity || '';
+      document.getElementById('modalMealPoints').value = meal.points;
+      document.getElementById('mealModal').classList.remove('hidden');
+    }
+    function closeMealModal() {
+      document.getElementById('mealModal').classList.add('hidden');
+    }
+    function addMealToDiary() {
+      if (!currentMeal) return;
+      const editedQuantity = document.getElementById('modalMealQuantity').value;
+      const editedPoints   = document.getElementById('modalMealPoints').value;
+      const diaryDate = document.getElementById('diaryDate').value || new Date().toISOString().split('T')[0];
+      const entry = {
+        food: currentMeal.name,
+        quantity: editedQuantity,
+        points: editedPoints,
+        time: new Date().toLocaleTimeString()
+      };
+      const key = getDiaryKey(diaryDate);
+      const diary = JSON.parse(localStorage.getItem(key)) || [];
+      diary.push(entry);
+      localStorage.setItem(key, JSON.stringify(diary));
+      renderDiaryForSelectedDate();
+      closeMealModal();
+      showTab('diaryTab');
+    }
+
+
+    // Language Change Function
+    function changeLanguage() {
+      currentLanguage = document.getElementById('languageSelect').value;
+      const langData = languageData[currentLanguage];
+      document.body.dir = langData.direction || "ltr";
+      document.getElementById('title').innerText = langData.title;
+      document.getElementById('carbsLabel').innerText = langData.carbsLabel;
+      document.getElementById('carbs').placeholder = langData.carbsPlaceholder;
+      document.getElementById('fibersLabel').innerText = langData.fibersLabel;
+      document.getElementById('fibers').placeholder = langData.fibersPlaceholder;
+      document.getElementById('fatsLabel').innerText = langData.fatsLabel;
+      document.getElementById('fats').placeholder = langData.fatsPlaceholder;
+      document.getElementById('proteinLabel').innerText = langData.proteinLabel;
+      document.getElementById('protein').placeholder = langData.proteinPlaceholder;
+      document.getElementById('amountLabel').innerText = langData.amountLabel;
+      document.getElementById('amount').placeholder = langData.amountPlaceholder;
+      document.getElementById('calculateBtn').innerText = langData.calculateBtn;
+      document.getElementById('result').innerText = '';
+      document.getElementById('diaryTitle').innerText = langData.diaryTitle;
+      document.getElementById('foodName').placeholder = langData.foodPlaceholder;
+      document.getElementById('foodPoints').placeholder = langData.pointsPlaceholder;
+      document.getElementById('addEntryBtn').innerText = langData.addEntryBtn;
+      document.getElementById('exportDataBtn').innerText = langData.exportDataBtn;
+      document.getElementById('exportModalTitle').innerText = langData.exportReportTitle;
+      renderDiaryForSelectedDate();
+    }
+
+    // Set Default Diary Date on Load
+    (function() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('diaryDate').value = today;
+    })();
+  </script>
+</body>
+</html>
