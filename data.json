@@ -2918,558 +2918,500 @@
 "name": "לחם קל (מופחת קלוריות)",
 "quantity": "פרוסה, 40 ג'",
 "points": 1
-}
+},
 {
 "name": "לחם שיפון",
 "quantity": "פרוסה, 30 ג'",
 "points": 1
-}
+},
 {
 "name": "לחם שיאור/מחמצת",
 "quantity": "פרוסה 30 ג'",
 "points": 1.5
-}
+},
 {
 "name": "לחמנייה ארוכה רגילה",
 "quantity": "יחידה, 80 ג'",
 "points": 6
-}
+},
 {
 "name": "לחמנייה מחיטה מלאה",
 "quantity": "יחידה, 75 ג'",
 "points": 5
-}
+},
 {
 "name": "לחמנייה קלה (מופחתת קלוריות)",
 "quantity": "יחידה, 50 ג'",
 "points": 2
-}
+},
 {
 "name": "לחמניית באגט",
 "quantity": "יחידה",
 "points": 6
-}
+},
 {
 "name": "לחמניית ביס",
 "quantity": "יחידה, 45 ג'",
 "points": 3
-}
+},
 {
 "name": "לחמניית המבורגר גדולה",
 "quantity": "120 ג'",
 "points": 8
-}
+},
 {
 "name": "לחמניית כוסמין",
 "quantity": "יחידה",
 "points": 3
-}
+},
 {
 "name": "לחמניית קשר",
 "quantity": "יחידה, 75 ג'",
 "points": 5
-}
+},
 {
 "name": "פיתה דרוזית",
 "quantity": "200 ג׳",
 "points": 12
-}
+},
 {
 "name": "פיתה מחיטה מלאה",
 "quantity": "יחידה, 75 ג'",
 "points": 5
-}
+},
 {
 "name": "פיתה רגילה",
 "quantity": "יחידה, 100 ג'",
 "points": 6
-}
+},
 {
 "name": "פיתה קלה",
 "quantity": "יחידה, 80 ג'",
 "points": 3
-}
+},
 {
 "name": "פיתה קלה",
 "quantity": "יחידה, 50 ג'",
 "points": 2
-}
+},
 {
 "name": "תחליף לחם, עד 5% שומן",
 "quantity": "יחידה גדולה",
 "points": 1
-}
+},
 {
 "name": "לימון/ליים",
 "quantity": null,
 "points": 0
-}
+},
 {
 "name": "ליצ'י טרי",
 "quantity": "6 יחידות",
 "points": 2
-}
+},
 {
 "name": "ליצ'י משומר",
 "quantity": "כוס",
 "points": 6
-}
+},
 {
 "name": "ליקר מכל סוג או ברנדי",
 "quantity": "כוסית, 40 מ\"ל",
 "points": 4
-}
+},
 {
 "name": "לפת",
 "quantity": null,
 "points": 0
-}
+},
 {
 "name": "מוס שוקולד 16% שומן",
 "quantity": "100 ג'",
 "points": 9
-}
+},
 {
 "name": "מיונז",
 "quantity": "כף שטוחה",
 "points": 2
-}
+},
 {
 "name": "מיונז לייט",
 "quantity": "2 כפות",
 "points": 1.5
-}
+},
 {
 "name": "מיונז עד 5% שומן",
 "quantity": "2 כפות",
 "points": 0.5
-}
+},
 {
 "name": "מלאווח",
 "quantity": "יחידה, 160 ג'",
 "points": 18
-}
+},
 {
 "name": "מירין",
 "quantity": "100 ג׳",
 "points": 6
-}
+},
 {
 "name": "מלון",
 "quantity": "כוס, 200 ג'",
 "points": 2
-}
+},
 {
 "name": "מלפפון",
 "quantity": null,
 "points": 0
-}
+},
 {
 "name": "ממרח וואסבי",
 "quantity": "כפית",
 "points": 0.5
-}
+},
 {
 "name": "ממרח וואסבי",
 "quantity": "100 ג׳",
 "points": 6.5
-}
+},
 {
 "name": "ממרח חרובים",
 "quantity": "כף שטוחה",
 "points": 3
-}
+},
 {
 "name": "ממרח חרובים",
 "quantity": "100 ג׳",
 "points": 15
-}
+},
 {
 "name": "ממרח פסטו",
 "quantity": "כף שטוחה",
 "points": 2
-}
+},
 {
 "name": "ממרח פסטו",
 "quantity": "100 ג׳",
-"points": 8-9
-}
+"points": 8
+},
 {
 "name": "ממרח שוקולד",
 "quantity": "כף שטוחה",
 "points": 3
-}
+},
 {
 "name": "ממרח שקדים",
 "quantity": "כף",
 "points": 2
-}
+},
 {
 "name": "ממרח שקדים",
 "quantity": "100 ג'",
 "points": 16
-}
+},
 {
 "name": "ממרח תמרים",
 "quantity": "כפית שטוחה",
 "points": 0.5
-}
+},
 {
 "name": "ממרח תמרים",
 "quantity": "כף שטוחה",
 "points": 2
-}
+},
 {
 "name": "ממרח תמרים",
 "quantity": "100 ג'",
 "points": 7
-}
+},
 {
 "name": "ממרח תמרים",
 "quantity": "כוס, 240 ג'",
 "points": 21
-}
+},
 {
 "name": "ממתיק מלאכותי",
 "quantity": "שקית",
 "points": 0
-}
+},
 {
 "name": "מנגו קוביות",
 "quantity": "חצי כוס",
 "points": 2
-}
+},
 {
 "name": "מנה חמה - פירה עם פטריות ובצל",
 "quantity": "יחידה, 85 ג'",
 "points": 5
-}
+},
 {
 "name": "מנה חמה - קוסקוס עם ירקות",
 "quantity": "יחידה, 85 ג'",
 "points": 7
-}
+},
 {
 "name": "מסטיק ללא סוכר קופסה",
 "quantity": "28 ג'",
 "points": 2
-}
+},
 {
 "name": "מצה",
 "quantity": null,
 "points": 3
-}
+},
 {
 "name": "מרגרינה לאפייה",
 "quantity": "100 ג'",
 "points": 21
-}
+},
 {
 "name": "מרגרינה רכה/לייט",
 "quantity": "כפית",
 "points": 1
-}
+},
 {
 "name": "מרק אבקה מכל סוג",
 "quantity": "כף שטוחה",
 "points": 1
-}
+},
 {
 "name": "מרק לייט שקית להכנה מהירה סוגים שונים",
 "quantity": null,
 "points": 2
-}
+},
 {
 "name": "מרק שקית להכנה מהירה סוגים שונים",
 "quantity": null,
 "points": 3
-}
-{
+},{
 "name": "מרק צח, ללא שומן",
 "quantity": null,
 "points": 0
-}
-{
+},{
 "name": "מרשמלו",
 "quantity": "4 יחידות",
 "points": 1
-}
-{
+},{
 "name": "משמש טרי",
 "quantity": "3 יח' קטנות",
 "points": 2
-}
-{
+},{
 "name": "משמש מיובש",
 "quantity": "100 ג'",
 "points": 7
-}
-{
+},{
 "name": "משמש מיובש",
 "quantity": "30 ג'",
 "points": 2
-}
-{
+},{
 "name": "משמש משומר במיץ טבעי /סירופ קל",
 "quantity": "100 ג'",
 "points": 2
-}
-{
+},{
 "name": "ויסקי / וודקה",
 "quantity": "כוסית, 40 מ\"ל",
 "points": 4
-}
-{
+},{
 "name": "יין אדום/לבן",
 "quantity": "כוסית, 120 מ\"ל",
 "points": 3
-}
-{
+},{
 "name": "יין מתוק לקידוש",
 "quantity": "כוסית, 60 מ\"ל",
 "points": 3
-}
-{
+},{
 "name": "משקה אלכוהולי מוגז",
 "quantity": "כוסית, 120 מ\"ל",
 "points": 3
-}
-{
+},{
 "name": "משקה אלכוהולי מוגז בטעמים",
 "quantity": "בקבוק, 275 מ\"ל",
 "points": 4
-}
-{
+},{
 "name": "בירה קלה",
 "quantity": "פחית / בקבוק",
 "points": 1.5
-}
-{
+},{
 "name": "בירה רגילה",
 "quantity": "330 מ\"ל",
 "points": 4
-}
-{
+},{
 "name": "רד בול או אקסל",
 "quantity": "פחית, 250 מ\"ל",
 "points": 3
-}
-{
+},{
 "name": "דיאט מאלט",
 "quantity": "פחית, 330 מ\"ל",
 "points": 1.5
-}
-{
+},{
 "name": "משקאות דיאטטים עד 10 קל' ל- 100 מ\"ל",
 "quantity": "2 כוסות",
 "points": 1
-}
-{
+},{
 "name": "משקאות דיאטטים עד 5 קל' ל- 100 מ\"ל",
 "quantity": "4 כוסות",
 "points": 1
-}
-{
+},{
 "name": "משקאות דיאט מוגזים",
 "quantity": null,
 "points": 0
-}
-{
+},{
 "name": "מיץ גזר",
 "quantity": "כוס, 250 מ\"ל",
 "points": 2
-}
-{
+},{
 "name": "מיץ ירקות, סחוט טרי",
 "quantity": null,
 "points": 0
-}
-{
+},{
 "name": "מיץ ירקות עם פרי סחוט",
 "quantity": "כוס, 250 מ\"ל",
 "points": 2
-}
-{
+},{
 "name": "מיץ עגבניות משומר",
 "quantity": "כוס, 250 מ\"ל",
 "points": 2.5
-}
-{
+},{
 "name": "מיץ ענבים (תירוש)",
 "quantity": "כוס, 250 מ\"ל",
 "points": 5
-}
-{
+},{
 "name": "מיץ פרי",
 "quantity": "כוס, 250 מ\"ל",
 "points": 3
-}
-{
+},{
 "name": "משקה מוגז ממותק",
 "quantity": "כוס, 250 מ\"ל",
 "points": 3
-}
-{
+},{
 "name": "משקה ממותק בסוכר",
 "quantity": "פחית, 330 מ\"ל",
 "points": 4.5
-}
-{
+},{
 "name": "מיץ תרכיז קפוא",
 "quantity": "קופסא 280 מ\"ל",
 "points": 4
-}
-{
+},{
 "name": "מיץ, תרכיז",
 "quantity": "100 מ\"ל",
 "points": 9
-}
-{
+},{
 "name": "מיץ, תרכיז",
 "quantity": "כף",
 "points": 1
-}
-{
+},{
 "name": "נבט חיטה",
 "quantity": "100 ג'",
 "points": 10
-}
-{
+},{
 "name": "נבטוטים",
 "quantity": "100 ג'",
 "points": 3
-}
-{
+},{
 "name": "נבטי אלפלפה שעועית/צנונית/ברוקולי / חמניות",
 "quantity": null,
 "points": 0
-}
-{
+},{
 "name": "ניוקי תפוחי אדמה לפני בישול",
 "quantity": "100 ג'",
 "points": 4
-}
-{
+},{
 "name": "ניוקי תפוחי אדמה אחרי בישול",
 "quantity": "כוס",
 "points": 6
-}
-{
+},{
 "name": "נענע",
 "quantity": null,
 "points": 0
-}
-{
+},{
 "name": "נקטרינה",
 "quantity": "יחידה בינונית",
 "points": 2
-}
-{
+},{
 "name": "נקניק יבש - קבנוס",
 "quantity": "50 ג'",
 "points": 5
-}
-{
+},{
 "name": "נקניק יבש סלמי/קוניאק/תה",
 "quantity": "100 ג'",
 "points": 7
-}
-{
+},{
 "name": "נקניקייה",
 "quantity": "יחידה, 36 ג'",
 "points": 2
-}
-{
+},{
 "name": "נקניקייה מן הצומח",
 "quantity": "יחידה קטנה, 12.5 ג'",
 "points": 1
-}
-{
+},{
 "name": "נקניקייה מן הצומח",
 "quantity": "יחידה גדולה, 33 ג'",
 "points": 2
-}
-{
+},{
 "name": "סברס",
 "quantity": "יחידה, 75 ג'",
 "points": 1
-}
-{
+},{
 "name": "סובין חיטה",
 "quantity": "כף",
 "points": 0
-}
-{
+},{
 "name": "סובין שיבולת שועל",
 "quantity": "כף",
 "points": 0.5
-}
-{
+},{
 "name": "סובין שיבולת שועל",
 "quantity": "100 ג'",
 "points": 9
-}
-{
+},{
 "name": "סודה לשתייה",
 "quantity": "שקית",
 "points": 0
-}
-{
+},{
 "name": "סוכר אבקה",
 "quantity": "100 ג'",
 "points": 11
-}
-{
+},{
 "name": "סוכר וניל",
 "quantity": "1 שקית",
 "points": 1
-}
-{
+},{
 "name": "סוכר לבן/חום",
 "quantity": "כוס, 180 ג'",
 "points": 19
-}
-{
+},{
 "name": "סוכר לבן/חום",
 "quantity": "כפית שטוחה",
 "points": 1
-}
-{
+},{
 "name": "סוכר לבן/חום",
 "quantity": "כף שטוחה",
 "points": 2
-}
-{
+},{
 "name": "סוכר, אבקה",
 "quantity": "100 ג׳",
 "points": 9
-}
-{
+},{
 "name": "סוכר, אבקה",
 "quantity": "כוס, 40 ג׳",
 "points": 4
-}
-{
+},{
 "name": "סוכריות גומי דלות קלוריות",
 "quantity": "100 ג'",
 "points": 3
-}
-{
+},{
 "name": "סוכריות גומי רגילות",
 "quantity": "100 ג'",
 "points": 10
-}
-{
+},{
 "name": "סוכריות טופי פירות",
 "quantity": "3 יח'",
 "points": 2
-}
-{
+},{
 "name": "סוכריות ללא סוכר",
 "quantity": "2 יח'",
 "points": 1
-}
-{
+},{
 "name": "סוכריות עדשים, כפתורי שוקולד צבעוניים",
 "quantity": "25 ג'",
 "points": 3
@@ -3478,163 +3420,131 @@
 "name": "סולת לפני בישול",
 "quantity": "כוס, 180 ג׳",
 "points": 16
-}
-{
+},{
 "name": "סולת לפני בישול",
 "quantity": "100 ג'",
 "points": 9
-}
-{
+},{
 "name": "סולת לפני בישול",
 "quantity": "3 כפות",
 "points": 5
-}
-{
+},{
 "name": "סולת מבושלת",
 "quantity": "כף",
 "points": 1
-}
-{
+},{
 "name": "סופגנייה בינונית ללא תוספות",
 "quantity": "יחידה",
 "points": 8
-}
-{
+},{
 "name": "סושי - מטוגן",
 "quantity": "יחידה",
 "points": 3
-}
-{
+},{
 "name": "סושי - ניגירי",
 "quantity": "6 יחידות",
 "points": 3
-}
-{
+},{
 "name": "קונוס סושי",
 "quantity": "יחידה",
 "points": 3
-}
-{
+},{
 "name": "סושי - קטן מאקי )עם ירקות או דג(",
 "quantity": "6 יחידות",
 "points": 3
-}
-{
+},{
 "name": "סושי בינוני, אינסיידאאוט )עם ירקות או דג(",
 "quantity": "6 יח׳",
 "points": 4
-}
-{
+},{
 "name": "סושי גדול, פוטומאקי )עם ירקות או דג(",
 "quantity": "6 יח׳",
 "points": 6
-}
-{
+},{
 "name": "סחוג",
 "quantity": "כף",
 "points": 0.5
-}
-{
+},{
 "name": "סחוג",
 "quantity": "100 ג'",
 "points": 4
-}
-{
+},{
 "name": "סחלב אבקה שקית",
 "quantity": "56 ג'",
 "points": 6
-}
-{
+},{
 "name": "סיגר, עלים",
 "quantity": "100 ג׳",
 "points": 6
-}
-{
+},{
 "name": "סיגר, עלה",
 "quantity": "יחידה, 25 ג׳",
 "points": 1
-}
-{
+},{
 "name": "סילאן",
 "quantity": "כפית שטוחה",
 "points": 1
-}
-{
+},{
 "name": "סילאן",
 "quantity": "כף שטוחה",
 "points": 2
-}
-{
+},{
 "name": "סילאן",
 "quantity": "1 כוס",
 "points": 29
-}
-{
+},{
 "name": "סירופ מי ורדים",
 "quantity": "100 ג׳",
 "points": 8
-}
-{
+},{
 "name": "סירופ שוקולד, מייפל, קרמל",
 "quantity": "כף",
 "points": 1
-}
-{
+},{
 "name": "סלטים מוכנים מכל סוג",
 "quantity": "1 כף שטוחה",
 "points": 1
-}
-{
+},{
 "name": "סלט גזר )עם תפוזים וצימוקים(",
 "quantity": "צלוחית",
 "points": 1
-}
-{
+},{
 "name": "סלט גזר מרוקאי",
 "quantity": "100 ג'",
 "points": 3
-}
-{
+},{
 "name": "סלט חומוס",
 "quantity": "כף שטוחה",
 "points": 1
-}
-{
+},{
 "name": "סלט טחינה",
 "quantity": "כף שטוחה",
 "points": 1
-}
-{
+},{
 "name": "סלט כרוב אדום במיונז",
 "quantity": "כף שטוחה",
 "points": 1
-}
-{
+},{
 "name": "סלט מטבוחה",
 "quantity": "כף שטוחה",
 "points": 2
-}
-{
+},{
 "name": "סלט פירות טריים",
 "quantity": "כוס",
 "points": 2
-}
-{
+},{
 "name": "סלט תפוחי אדמה במיונז",
 "quantity": "100 ג'",
 "points": 6
-}
-{
+},{
 "name": "סלק",
 "quantity": null,
 "points": 0
-}
-{
+},{
 "name": "סלרי עלים",
 "quantity": null,
 "points": 0
-}
-{
+},{
 "name": "סלרי שורש )כרפס(",
 "quantity": null,
 "points": 0
