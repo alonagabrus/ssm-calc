@@ -338,7 +338,7 @@ Then open http://localhost:8000 in your browser.
       });
     });
 
-    // Search & Autocomplete
+    // Search & Autocomplete Logic
     document.getElementById('searchInput').addEventListener('input', function() {
       const query = this.value.toLowerCase();
       const resultsContainer = document.getElementById('searchResults');
@@ -346,11 +346,30 @@ Then open http://localhost:8000 in your browser.
       if (!query) return;
       const filtered = mealData.filter(meal => meal.name && meal.name.toLowerCase().includes(query));
       filtered.forEach(meal => {
-        const div = document.createElement('div');
-        div.className = 'search-item p-3 border border-gray-300 rounded mb-2 cursor-pointer bg-white hover:bg-gray-100';
-        div.innerHTML = `<strong>${meal.name}</strong> — ${meal.quantity || ''} — ${meal.points} pts`;
-        div.onclick = () => openMealModal(meal);
-        resultsContainer.appendChild(div);
+        // Create a card container for the search result
+        const card = document.createElement('div');
+        card.className = 'search-item p-3 border border-gray-300 rounded mb-2 cursor-pointer bg-white hover:bg-gray-100';
+        // Create name element
+        const nameEl = document.createElement('div');
+        nameEl.className = 'font-bold text-lg';
+        nameEl.textContent = meal.name;
+        // Create details container for quantity and points
+        const detailsEl = document.createElement('div');
+        detailsEl.className = 'flex justify-between text-sm mt-2';
+        // Create quantity element (left side)
+        const quantityEl = document.createElement('div');
+        quantityEl.textContent = meal.quantity || '';
+        // Create points element (right side) without "pts" text
+        const pointsEl = document.createElement('div');
+        pointsEl.textContent = meal.points;
+        detailsEl.appendChild(quantityEl);
+        detailsEl.appendChild(pointsEl);
+        // Append name and details to the card
+        card.appendChild(nameEl);
+        card.appendChild(detailsEl);
+        // Set up click to open meal modal for editing/adding to diary
+        card.onclick = () => openMealModal(meal);
+        resultsContainer.appendChild(card);
       });
     });
 
@@ -384,7 +403,6 @@ Then open http://localhost:8000 in your browser.
       closeMealModal();
       showTab('diaryTab');
     }
-
 
     // Language Change Function
     function changeLanguage() {
