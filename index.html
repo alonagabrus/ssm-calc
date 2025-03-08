@@ -5,7 +5,7 @@ For example, if you have Python installed, run:
 Then open http://localhost:8000 in your browser.
 -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="he">
 <head>
   <meta charset="UTF-8" />
   <title>Bilingual Nutrition Calculator & Diary</title>
@@ -28,11 +28,11 @@ Then open http://localhost:8000 in your browser.
     <span class="text-3xl font-bold text-blue-500">Nutrition App</span>
   </div>
 
-  <!-- Language Selector -->
+  <!-- Language Selector (default Hebrew) -->
   <select id="languageSelect" onchange="changeLanguage()"
           class="block mx-auto mb-5 p-2 text-base rounded border border-gray-300">
+    <option value="he" selected>עברית</option>
     <option value="en">English</option>
-    <option value="he">עברית</option>
   </select>
 
   <!-- Tab Navigation with Icons -->
@@ -113,7 +113,7 @@ Then open http://localhost:8000 in your browser.
       <input type="text" id="searchInput" placeholder="Search meals by name"
              class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-blue-500" />
       <!-- Dropdown container for search results -->
-      <div id="searchResults" class="absolute w-full mt-1 bg-white border border-gray-300 rounded max-h-48 overflow-y-auto z-10"></div>
+      <div id="searchResults" class="absolute left-0 right-0 w-full mt-1 bg-white border border-gray-300 rounded max-h-48 overflow-y-auto z-10"></div>
     </div>
   </div>
 
@@ -232,7 +232,8 @@ Then open http://localhost:8000 in your browser.
         exportReportTitle: "דוח יומן מזון"
       }
     };
-    let currentLanguage = 'en';
+    // Set default language to Hebrew
+    let currentLanguage = 'he';
     let mealData = [];
     let currentMeal = null;
 
@@ -448,10 +449,11 @@ Then open http://localhost:8000 in your browser.
       renderDiaryForSelectedDate();
     }
 
-    // Set Default Diary Date on Load
+    // Set Default Diary Date on Load and initialize language settings
     (function() {
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('diaryDate').value = today;
+      changeLanguage();
     })();
   </script>
 </body>
