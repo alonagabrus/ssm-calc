@@ -4,7 +4,6 @@ For example, if you have Python installed, run:
   python -m http.server
 Then open http://localhost:8000 in your browser.
 -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,14 +11,23 @@ Then open http://localhost:8000 in your browser.
   <title>Bilingual Nutrition Calculator & Diary</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <!-- Tailwind CSS via CDN for development.
-       For production, install Tailwind as a PostCSS plugin or use the CLI.
-       See: https://tailwindcss.com/docs/installation -->
+  <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" 
+        integrity="sha512-p0QXGsn/gd6nM8OIfLUfOblW7/IR3R8a6t/tSP68UjLGI6RF1A+NiPz88vZR5I0pNs6bdYZn+Yf/5YtY0V8lnA==" 
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
   <!-- html2canvas if needed -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-gray-100 to-blue-200 p-5">
+  <!-- Header with Logo and App Title -->
+  <div class="flex items-center justify-center mb-5">
+    <!-- Replace logo.png with your logo image if available -->
+    <img src="https://via.placeholder.com/40" alt="Logo" class="h-10 mr-3">
+    <span class="text-3xl font-bold text-blue-500">Nutrition App</span>
+  </div>
+
   <!-- Language Selector -->
   <select id="languageSelect" onchange="changeLanguage()"
           class="block mx-auto mb-5 p-2 text-base rounded border border-gray-300">
@@ -27,14 +35,20 @@ Then open http://localhost:8000 in your browser.
     <option value="he">עברית</option>
   </select>
 
-  <!-- Tab Navigation -->
+  <!-- Tab Navigation with Icons -->
   <div class="flex justify-center mb-5">
-    <button class="tab-button flex-1 p-3 bg-gray-300 hover:bg-gray-400 transition-colors"
-            onclick="showTab('calculatorTab')">Calculator</button>
-    <button class="tab-button flex-1 p-3 bg-gray-300 hover:bg-gray-400 transition-colors"
-            onclick="showTab('diaryTab')">Diary</button>
-    <button class="tab-button flex-1 p-3 bg-gray-300 hover:bg-gray-400 transition-colors"
-            onclick="showTab('searchTab')">Search</button>
+    <button class="tab-button flex-1 p-3 bg-gray-300 hover:bg-gray-400 transition-colors flex items-center justify-center gap-2"
+            onclick="showTab('calculatorTab')">
+      <i class="fa-solid fa-calculator"></i><span>Calculator</span>
+    </button>
+    <button class="tab-button flex-1 p-3 bg-gray-300 hover:bg-gray-400 transition-colors flex items-center justify-center gap-2"
+            onclick="showTab('diaryTab')">
+      <i class="fa-solid fa-book-open"></i><span>Diary</span>
+    </button>
+    <button class="tab-button flex-1 p-3 bg-gray-300 hover:bg-gray-400 transition-colors flex items-center justify-center gap-2"
+            onclick="showTab('searchTab')">
+      <i class="fa-solid fa-magnifying-glass"></i><span>Search</span>
+    </button>
   </div>
 
   <!-- Calculator Tab -->
@@ -94,11 +108,12 @@ Then open http://localhost:8000 in your browser.
 
   <!-- Search Tab -->
   <div id="searchTab" class="tab-content hidden">
-    <div id="searchContainer" class="bg-white p-8 rounded-lg max-w-md mx-auto mb-10 shadow-lg">
+    <div id="searchContainer" class="relative bg-white p-8 rounded-lg max-w-md mx-auto mb-10 shadow-lg">
       <h2 class="text-center text-2xl text-blue-500 mb-5">Search Meals</h2>
       <input type="text" id="searchInput" placeholder="Search meals by name"
              class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-blue-500" />
-      <div id="searchResults" class="mt-4"></div>
+      <!-- Dropdown container for search results -->
+      <div id="searchResults" class="absolute w-full mt-1 bg-white border border-gray-300 rounded max-h-48 overflow-y-auto z-10"></div>
     </div>
   </div>
 
@@ -169,6 +184,7 @@ Then open http://localhost:8000 in your browser.
     // Language Data & Global Variables
     const languageData = {
       en: {
+        direction: "ltr",
         title: "Nutrition Calculator",
         carbsLabel: "Carbs (g):",
         carbsPlaceholder: "Enter carbs in grams",
@@ -192,6 +208,7 @@ Then open http://localhost:8000 in your browser.
         exportReportTitle: "Diary Export"
       },
       he: {
+        direction: "rtl",
         title: "מחשבון תזונה",
         carbsLabel: "פחמימות (גרם):",
         carbsPlaceholder: "הזן פחמימות בגרמים",
@@ -230,7 +247,7 @@ Then open http://localhost:8000 in your browser.
       document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
       document.getElementById(tabId).classList.remove('hidden');
       // Update active button classes
-      document.querySelectorAll('.tab-button').forEach((btn, i) => btn.classList.remove('bg-blue-500','text-white'));
+      document.querySelectorAll('.tab-button').forEach((btn) => btn.classList.remove('bg-blue-500','text-white'));
       if(tabId === 'calculatorTab'){
         document.querySelectorAll('.tab-button')[0].classList.add('bg-blue-500','text-white');
       } else if(tabId === 'diaryTab'){
@@ -348,8 +365,8 @@ Then open http://localhost:8000 in your browser.
       filtered.forEach(meal => {
         // Create a card container for the search result
         const card = document.createElement('div');
-        card.className = 'search-item p-3 border border-gray-300 rounded mb-2 cursor-pointer bg-white hover:bg-gray-100';
-        // Create name element
+        card.className = 'search-item p-3 border-b border-gray-200 cursor-pointer hover:bg-gray-100';
+        // Create name element with bold text
         const nameEl = document.createElement('div');
         nameEl.className = 'font-bold text-lg';
         nameEl.textContent = meal.name;
