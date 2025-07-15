@@ -1,460 +1,622 @@
-<!-- 
-To run this project locally and avoid CORS issues, use a local HTTP server.
-For example, if you have Python installed, run:
-  python -m http.server
-Then open http://localhost:8000 in your browser.
--->
 <!DOCTYPE html>
-<html lang="he">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Bilingual Nutrition Calculator & Diary</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <!-- Tailwind CSS via CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" 
-        integrity="sha512-p0QXGsn/gd6nM8OIfLUfOblW7/IR3R8a6t/tSP68UjLGI6RF1A+NiPz88vZR5I0pNs6bdYZn+Yf/5YtY0V8lnA==" 
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <!-- html2canvas if needed -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-</head>
-<body class="min-h-screen bg-gradient-to-br from-gray-100 to-blue-200 p-5">
-  <!-- Header with Logo and App Title -->
-  <div class="flex items-center justify-center mb-5">
-    <!-- Replace logo.png with your logo image if available -->
-    <img src="https://via.placeholder.com/40" alt="Logo" class="h-10 mr-3">
-    <span class="text-3xl font-bold text-blue-500">Nutrition App</span>
-  </div>
-
-  <!-- Language Selector (default Hebrew) -->
-  <select id="languageSelect" onchange="changeLanguage()"
-          class="block mx-auto mb-5 p-2 text-base rounded border border-gray-300">
-    <option value="he" selected>עברית</option>
-    <option value="en">English</option>
-  </select>
-
-  <!-- Tab Navigation with Icons -->
-  <div class="flex justify-center mb-5">
-    <button class="tab-button flex-1 p-3 bg-gray-300 hover:bg-gray-400 transition-colors flex items-center justify-center gap-2"
-            onclick="showTab('calculatorTab')">
-      <i class="fa-solid fa-calculator"></i><span>Calculator</span>
-    </button>
-    <button class="tab-button flex-1 p-3 bg-gray-300 hover:bg-gray-400 transition-colors flex items-center justify-center gap-2"
-            onclick="showTab('diaryTab')">
-      <i class="fa-solid fa-book-open"></i><span>Diary</span>
-    </button>
-    <button class="tab-button flex-1 p-3 bg-gray-300 hover:bg-gray-400 transition-colors flex items-center justify-center gap-2"
-            onclick="showTab('searchTab')">
-      <i class="fa-solid fa-magnifying-glass"></i><span>Search</span>
-    </button>
-  </div>
-
-  <!-- Calculator Tab -->
-  <div id="calculatorTab" class="tab-content">
-    <div id="calculator" class="bg-white p-8 rounded-lg max-w-md mx-auto mb-10 shadow-lg">
-      <h2 id="title" class="text-center text-2xl text-blue-500 mb-5">Nutrition Calculator</h2>
-      <label for="carbs" id="carbsLabel" class="block mt-4 font-semibold">Carbs (g):</label>
-      <input type="number" id="carbs" placeholder="Enter carbs in grams"
-             class="w-full p-3 mt-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500" />
-      <label for="fibers" id="fibersLabel" class="block mt-4 font-semibold">Fibers (g):</label>
-      <input type="number" id="fibers" placeholder="Enter fibers in grams"
-             class="w-full p-3 mt-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500" />
-      <label for="fats" id="fatsLabel" class="block mt-4 font-semibold">Fats (g):</label>
-      <input type="number" id="fats" placeholder="Enter fats in grams"
-             class="w-full p-3 mt-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500" />
-      <label for="protein" id="proteinLabel" class="block mt-4 font-semibold">Protein (g):</label>
-      <input type="number" id="protein" placeholder="Enter protein in grams"
-             class="w-full p-3 mt-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500" />
-      <label for="amount" id="amountLabel" class="block mt-4 font-semibold">Amount (g):</label>
-      <input type="number" id="amount" placeholder="Enter total amount in grams" value="100"
-             class="w-full p-3 mt-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500" />
-      <button id="calculateBtn" onclick="calculate()"
-              class="w-full p-4 mt-6 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
-        Calculate
-      </button>
-      <div id="result" class="result text-center text-2xl text-blue-500 mt-6"></div>
-    </div>
-  </div>
-
-  <!-- Diary Tab -->
-  <div id="diaryTab" class="tab-content hidden">
-    <div id="foodDiary" class="bg-white p-8 rounded-lg max-w-md mx-auto mb-10 shadow-lg">
-      <h3 id="diaryTitle" class="text-center text-2xl text-blue-500 mb-5">Food Diary</h3>
-      <div class="diary-controls flex justify-between items-center mb-4">
-        <input type="date" id="diaryDate" onchange="renderDiaryForSelectedDate()"
-               class="w-1/2 p-2 border border-gray-300 rounded" />
-        <button id="exportDataBtn" onclick="showExportModal()"
-                class="w-1/2 p-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
-          Export Data
-        </button>
-      </div>
-      <div class="mb-4">
-        <input type="text" id="foodName" placeholder="Enter food item"
-               class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-blue-500" />
-      </div>
-      <div class="mb-4">
-        <input type="number" id="foodPoints" placeholder="Points"
-               class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-blue-500" />
-      </div>
-      <button id="addEntryBtn" onclick="addDiaryEntry()"
-              class="w-full p-4 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
-        Add Entry
-      </button>
-      <ul id="diaryList" class="diary-list mt-4 list-none"></ul>
-    </div>
-  </div>
-
-  <!-- Search Tab -->
-  <div id="searchTab" class="tab-content hidden">
-    <div id="searchContainer" class="relative bg-white p-8 rounded-lg max-w-md mx-auto mb-10 shadow-lg">
-      <h2 class="text-center text-2xl text-blue-500 mb-5">Search Meals</h2>
-      <input type="text" id="searchInput" placeholder="Search meals by name"
-             class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-blue-500" />
-      <!-- Dropdown container for search results -->
-      <div id="searchResults" class="absolute left-0 right-0 w-full mt-1 bg-white border border-gray-300 rounded max-h-48 overflow-y-auto z-10"></div>
-    </div>
-  </div>
-
-  <!-- Export Modal with increased z-index -->
-  <div id="exportModal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-    <div class="modal-content bg-white p-6 rounded shadow-lg max-w-md w-full mx-4 relative">
-      <span class="close absolute top-2 right-2 text-gray-500 text-2xl cursor-pointer" onclick="closeExportModal()">&times;</span>
-      <h2 id="exportModalTitle" class="text-center text-2xl text-blue-500 mb-4">Export Report</h2>
-      <div class="mb-4">
-        <label class="inline-flex items-center mr-4">
-          <input type="radio" name="exportType" value="single" checked class="form-radio" />
-          <span class="ml-2">Single Day</span>
-        </label>
-        <label class="inline-flex items-center">
-          <input type="radio" name="exportType" value="range" class="form-radio" />
-          <span class="ml-2">Date Range</span>
-        </label>
-      </div>
-      <div id="singleExportSection" class="mb-4">
-        <input type="date" id="exportSingleDate" class="w-full p-2 border border-gray-300 rounded mb-2" />
-        <div class="flex space-x-2">
-          <button onclick="setExportDateShortcut('today')"
-                  class="flex-1 p-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
-            Today
-          </button>
-          <button onclick="setExportDateShortcut('yesterday')"
-                  class="flex-1 p-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
-            Yesterday
-          </button>
-        </div>
-      </div>
-      <div id="rangeExportSection" class="mb-4 hidden">
-        <label class="block mb-1">Start Date:</label>
-        <input type="date" id="exportStartDate" class="w-full p-2 border border-gray-300 rounded mb-2" />
-        <label class="block mb-1">End Date:</label>
-        <input type="date" id="exportEndDate" class="w-full p-2 border border-gray-300 rounded" />
-      </div>
-      <button onclick="generateExportReport()"
-              class="w-full p-3 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
-        Generate Report
-      </button>
-    </div>
-  </div>
-
-  <!-- Meal Modal for Search Results with increased z-index -->
-  <div id="mealModal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-    <div class="modal-content bg-white p-6 rounded shadow-lg max-w-md w-full mx-4 relative">
-      <span class="close absolute top-2 right-2 text-gray-500 text-2xl cursor-pointer" onclick="closeMealModal()">&times;</span>
-      <h2 id="modalMealName" class="text-center text-2xl text-blue-500 mb-4"></h2>
-      <p class="mb-2">
-        Quantity:
-        <input type="text" id="modalMealQuantity"
-               class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500" />
-      </p>
-      <p class="mb-4">
-        Points:
-        <input type="number" id="modalMealPoints"
-               class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500" />
-      </p>
-      <button onclick="addMealToDiary()"
-              class="w-full p-3 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
-        Add to Diary
-      </button>
-    </div>
-  </div>
-
-  <script>
-    // Language Data & Global Variables
-    const languageData = {
-      en: {
-        direction: "ltr",
-        title: "Nutrition Calculator",
-        carbsLabel: "Carbs (g):",
-        carbsPlaceholder: "Enter carbs in grams",
-        fibersLabel: "Fibers (g):",
-        fibersPlaceholder: "Enter fibers in grams",
-        fatsLabel: "Fats (g):",
-        fatsPlaceholder: "Enter fats in grams",
-        proteinLabel: "Protein (g):",
-        proteinPlaceholder: "Enter protein in grams",
-        amountLabel: "Amount (g):",
-        amountPlaceholder: "Enter total amount in grams",
-        calculateBtn: "Calculate",
-        resultText: "Result: ",
-        diaryTitle: "Food Diary",
-        foodPlaceholder: "Enter food item",
-        pointsPlaceholder: "Points",
-        addEntryBtn: "Add Entry",
-        exportDataBtn: "Export Data",
-        deleteBtn: "Delete",
-        alertMissingEntry: "Please enter both food and points.",
-        exportReportTitle: "Diary Export"
-      },
-      he: {
-        direction: "rtl",
-        title: "מחשבון תזונה",
-        carbsLabel: "פחמימות (גרם):",
-        carbsPlaceholder: "הזן פחמימות בגרמים",
-        fibersLabel: "סיבים (גרם):",
-        fibersPlaceholder: "הזן סיבים בגרמים",
-        fatsLabel: "שומנים (גרם):",
-        fatsPlaceholder: "הזן שומנים בגרמים",
-        proteinLabel: "חלבון (גרם):",
-        proteinPlaceholder: "הזן חלבון בגרמים",
-        amountLabel: "כמות (גרם):",
-        amountPlaceholder: "הזן כמות כוללת בגרמים",
-        calculateBtn: "חשב",
-        resultText: "תוצאה: ",
-        diaryTitle: "יומן מזון",
-        foodPlaceholder: "הזן פריט מזון",
-        pointsPlaceholder: "נקודות",
-        addEntryBtn: "הוסף רשומה",
-        exportDataBtn: "ייצא נתונים",
-        deleteBtn: "מחק",
-        alertMissingEntry: "אנא הזן פריט מזון ונקודות.",
-        exportReportTitle: "דוח יומן מזון"
-      }
-    };
-    // Set default language to Hebrew
-    let currentLanguage = 'he';
-    let mealData = [];
-    let currentMeal = null;
-
-    // Load Meal Data from JSON File
-    fetch('data.json')
-      .then(response => response.json())
-      .then(data => { mealData = data; })
-      .catch(err => console.error('Error loading meal data:', err));
-
-    // Tab Switching
-    function showTab(tabId) {
-      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
-      document.getElementById(tabId).classList.remove('hidden');
-      // Update active button classes
-      document.querySelectorAll('.tab-button').forEach((btn) => btn.classList.remove('bg-blue-500','text-white'));
-      if(tabId === 'calculatorTab'){
-        document.querySelectorAll('.tab-button')[0].classList.add('bg-blue-500','text-white');
-      } else if(tabId === 'diaryTab'){
-        document.querySelectorAll('.tab-button')[1].classList.add('bg-blue-500','text-white');
-      } else if(tabId === 'searchTab'){
-        document.querySelectorAll('.tab-button')[2].classList.add('bg-blue-500','text-white');
-      }
-    }
-    // Initially show calculator tab, hide others
-    document.getElementById('calculatorTab').classList.remove('hidden');
-    document.getElementById('diaryTab').classList.add('hidden');
-    document.getElementById('searchTab').classList.add('hidden');
-
-    // Calculator Function
-    function calculate() {
-      const carbs   = parseFloat(document.getElementById('carbs').value) || 0;
-      const fibers  = parseFloat(document.getElementById('fibers').value) || 0;
-      const fats    = parseFloat(document.getElementById('fats').value) || 0;
-      const protein = parseFloat(document.getElementById('protein').value) || 0;
-      const amount  = parseFloat(document.getElementById('amount').value) || 0;
-      const calculation = (((fats / 3.880) + (carbs / 9.2105) + (protein / 10.9375) - (fibers / 12.5)) * amount) / 100;
-      document.getElementById('result').innerText = languageData[currentLanguage].resultText + calculation.toFixed(1);
-    }
-
-    // Diary Functions
-    function getDiaryKey(dateStr) {
-      return "diary-" + dateStr;
-    }
-    function addDiaryEntry() {
-      const food   = document.getElementById('foodName').value.trim();
-      const points = document.getElementById('foodPoints').value.trim();
-      if (!food || !points) {
-        alert(languageData[currentLanguage].alertMissingEntry);
-        return;
-      }
-      const diaryDate = document.getElementById('diaryDate').value || new Date().toISOString().split('T')[0];
-      const entry = { food, points, time: new Date().toLocaleTimeString() };
-      const key = getDiaryKey(diaryDate);
-      const diary = JSON.parse(localStorage.getItem(key)) || [];
-      diary.push(entry);
-      localStorage.setItem(key, JSON.stringify(diary));
-      renderDiaryForSelectedDate();
-      document.getElementById('foodName').value = '';
-      document.getElementById('foodPoints').value = '';
-    }
-    function renderDiaryForSelectedDate() {
-      const diaryDate = document.getElementById('diaryDate').value || new Date().toISOString().split('T')[0];
-      const key = getDiaryKey(diaryDate);
-      const diary = JSON.parse(localStorage.getItem(key)) || [];
-      const diaryList = document.getElementById('diaryList');
-      diaryList.innerHTML = '';
-      diary.forEach((entry, index) => {
-        const li = document.createElement('li');
-        li.className = "flex justify-between bg-gray-100 p-3 rounded mb-2";
-        li.innerHTML = `<span>${entry.time} - ${entry.food}: ${entry.points}</span>
-                        <button onclick="deleteEntry('${diaryDate}', ${index})" class="bg-red-500 text-white px-3 py-1 rounded">
-                          ${languageData[currentLanguage].deleteBtn || "Delete"}
-                        </button>`;
-        diaryList.appendChild(li);
-      });
-    }
-    function deleteEntry(dateStr, index) {
-      const key = getDiaryKey(dateStr);
-      const diary = JSON.parse(localStorage.getItem(key)) || [];
-      diary.splice(index, 1);
-      localStorage.setItem(key, JSON.stringify(diary));
-      renderDiaryForSelectedDate();
-    }
-
-    // Export Modal Functions
-    function showExportModal() {
-      document.getElementById("exportModal").classList.remove("hidden");
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById("exportSingleDate").value = today;
-      document.getElementById("exportStartDate").value = today;
-      document.getElementById("exportEndDate").value = today;
-    }
-    function closeExportModal() {
-      document.getElementById("exportModal").classList.add("hidden");
-    }
-    function setExportDateShortcut(shortcut) {
-      const todayDate = new Date();
-      let date;
-      if (shortcut === 'today') {
-        date = todayDate;
-      } else if (shortcut === 'yesterday') {
-        date = new Date(todayDate.getTime() - 24 * 60 * 60 * 1000);
-      }
-      const dateStr = date.toISOString().split('T')[0];
-      document.getElementById("exportSingleDate").value = dateStr;
-    }
-    function generateExportReport() {
-      alert("Export report functionality is not fully implemented in this demo.");
-      closeExportModal();
-    }
-    document.querySelectorAll('input[name="exportType"]').forEach(radio => {
-      radio.addEventListener('change', function() {
-        if (this.value === 'single') {
-          document.getElementById("singleExportSection").classList.remove("hidden");
-          document.getElementById("rangeExportSection").classList.add("hidden");
-        } else {
-          document.getElementById("singleExportSection").classList.add("hidden");
-          document.getElementById("rangeExportSection").classList.remove("hidden");
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Applications</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-      });
-    });
 
-    // Search & Autocomplete Logic
-    document.getElementById('searchInput').addEventListener('input', function() {
-      const query = this.value.toLowerCase();
-      const resultsContainer = document.getElementById('searchResults');
-      resultsContainer.innerHTML = '';
-      if (!query) return;
-      const filtered = mealData.filter(meal => meal.name && meal.name.toLowerCase().includes(query));
-      filtered.forEach(meal => {
-        // Create a card container for the search result
-        const card = document.createElement('div');
-        card.className = 'search-item p-3 border-b border-gray-200 cursor-pointer hover:bg-gray-100';
-        // Create name element with bold text
-        const nameEl = document.createElement('div');
-        nameEl.className = 'font-bold text-lg';
-        nameEl.textContent = meal.name;
-        // Create details container for quantity and points
-        const detailsEl = document.createElement('div');
-        detailsEl.className = 'flex justify-between text-sm mt-2';
-        // Create quantity element (left side)
-        const quantityEl = document.createElement('div');
-        quantityEl.textContent = meal.quantity || '';
-        // Create points element (right side) without "pts" text
-        const pointsEl = document.createElement('div');
-        pointsEl.textContent = meal.points;
-        detailsEl.appendChild(quantityEl);
-        detailsEl.appendChild(pointsEl);
-        // Append name and details to the card
-        card.appendChild(nameEl);
-        card.appendChild(detailsEl);
-        // Set up click to open meal modal for editing/adding to diary
-        card.onclick = () => openMealModal(meal);
-        resultsContainer.appendChild(card);
-      });
-    });
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-    // Meal Modal Functions
-    function openMealModal(meal) {
-      currentMeal = meal;
-      document.getElementById('modalMealName').innerText = meal.name;
-      document.getElementById('modalMealQuantity').value = meal.quantity || '';
-      document.getElementById('modalMealPoints').value = meal.points;
-      document.getElementById('mealModal').classList.remove('hidden');
-    }
-    function closeMealModal() {
-      document.getElementById('mealModal').classList.add('hidden');
-    }
-    function addMealToDiary() {
-      if (!currentMeal) return;
-      const editedQuantity = document.getElementById('modalMealQuantity').value;
-      const editedPoints   = document.getElementById('modalMealPoints').value;
-      const diaryDate = document.getElementById('diaryDate').value || new Date().toISOString().split('T')[0];
-      const entry = {
-        food: currentMeal.name,
-        quantity: editedQuantity,
-        points: editedPoints,
-        time: new Date().toLocaleTimeString()
-      };
-      const key = getDiaryKey(diaryDate);
-      const diary = JSON.parse(localStorage.getItem(key)) || [];
-      diary.push(entry);
-      localStorage.setItem(key, JSON.stringify(diary));
-      renderDiaryForSelectedDate();
-      closeMealModal();
-      showTab('diaryTab');
-    }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
 
-    // Language Change Function
-    function changeLanguage() {
-      currentLanguage = document.getElementById('languageSelect').value;
-      const langData = languageData[currentLanguage];
-      document.body.dir = langData.direction || "ltr";
-      document.getElementById('title').innerText = langData.title;
-      document.getElementById('carbsLabel').innerText = langData.carbsLabel;
-      document.getElementById('carbs').placeholder = langData.carbsPlaceholder;
-      document.getElementById('fibersLabel').innerText = langData.fibersLabel;
-      document.getElementById('fibers').placeholder = langData.fibersPlaceholder;
-      document.getElementById('fatsLabel').innerText = langData.fatsLabel;
-      document.getElementById('fats').placeholder = langData.fatsPlaceholder;
-      document.getElementById('proteinLabel').innerText = langData.proteinLabel;
-      document.getElementById('protein').placeholder = langData.proteinPlaceholder;
-      document.getElementById('amountLabel').innerText = langData.amountLabel;
-      document.getElementById('amount').placeholder = langData.amountPlaceholder;
-      document.getElementById('calculateBtn').innerText = langData.calculateBtn;
-      document.getElementById('result').innerText = '';
-      document.getElementById('diaryTitle').innerText = langData.diaryTitle;
-      document.getElementById('foodName').placeholder = langData.foodPlaceholder;
-      document.getElementById('foodPoints').placeholder = langData.pointsPlaceholder;
-      document.getElementById('addEntryBtn').innerText = langData.addEntryBtn;
-      document.getElementById('exportDataBtn').innerText = langData.exportDataBtn;
-      document.getElementById('exportModalTitle').innerText = langData.exportReportTitle;
-      renderDiaryForSelectedDate();
-    }
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            color: #2d3748;
+        }
 
-    // Set Default Diary Date on Load and initialize language settings
-    (function() {
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById('diaryDate').value = today;
-      changeLanguage();
-    })();
-  </script>
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #718096;
+            font-weight: 400;
+        }
+
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .app-card {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+            border: 1px solid rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .app-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .app-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #4a5568, #2d3748);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: white;
+            font-weight: 500;
+        }
+
+        .app-title {
+            font-size: 1.4rem;
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: #2d3748;
+        }
+
+        .app-description {
+            color: #718096;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .app-url {
+            color: #4a5568;
+            font-size: 0.85rem;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+            background: #f7fafc;
+            padding: 6px 12px;
+            border-radius: 6px;
+            word-break: break-all;
+            border: 1px solid #e2e8f0;
+        }
+
+        .add-app-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #4a5568, #2d3748);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+        }
+
+        .add-app-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 25px rgba(0,0,0,0.2);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .modal h2 {
+            margin-bottom: 20px;
+            color: #2d3748;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4a5568;
+            box-shadow: 0 0 0 3px rgba(74, 85, 104, 0.1);
+        }
+
+        .form-group textarea {
+            height: 80px;
+            resize: vertical;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4a5568, #2d3748);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .btn-secondary {
+            background: #f7fafc;
+            color: #4a5568;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #edf2f7;
+            border-color: #cbd5e0;
+        }
+
+        /* Enhanced Mobile Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+            
+            .header {
+                margin-bottom: 30px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+                margin-bottom: 8px;
+                font-weight: 300;
+            }
+            
+            .header p {
+                font-size: 1rem;
+            }
+            
+            .apps-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .app-card {
+                padding: 25px 20px;
+                margin-bottom: 0;
+            }
+            
+            .app-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+                margin-bottom: 15px;
+            }
+            
+            .app-title {
+                font-size: 1.3rem;
+                margin-bottom: 8px;
+            }
+            
+            .app-description {
+                font-size: 0.9rem;
+                margin-bottom: 12px;
+            }
+            
+            .app-url {
+                font-size: 0.8rem;
+                padding: 8px 10px;
+            }
+            
+            .add-app-btn {
+                bottom: 20px;
+                right: 20px;
+                width: 56px;
+                height: 56px;
+                font-size: 22px;
+            }
+            
+            .modal-content {
+                width: 95%;
+                max-width: 400px;
+                padding: 30px 20px;
+                margin: 20px;
+            }
+            
+            .modal h2 {
+                font-size: 1.4rem;
+                margin-bottom: 15px;
+            }
+            
+            .form-group {
+                margin-bottom: 15px;
+            }
+            
+            .form-group input,
+            .form-group textarea {
+                padding: 14px 12px;
+                font-size: 16px; /* Prevents zoom on iOS */
+                border-radius: 10px;
+            }
+            
+            .form-group textarea {
+                height: 70px;
+            }
+            
+            .modal-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .btn {
+                padding: 14px 20px;
+                font-size: 16px;
+                border-radius: 10px;
+                min-height: 48px; /* Touch target size */
+            }
+        }
+        
+        /* Very small screens */
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px 10px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+                font-weight: 300;
+            }
+            
+            .app-card {
+                padding: 20px 15px;
+            }
+            
+            .app-icon {
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+            }
+            
+            .app-title {
+                font-size: 1.2rem;
+            }
+            
+            .modal-content {
+                width: 98%;
+                padding: 25px 15px;
+            }
+        }
+        
+        /* Landscape mobile */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .apps-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .app-card {
+                padding: 20px 15px;
+            }
+            
+            .header {
+                margin-bottom: 25px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+                font-weight: 300;
+            }
+        }
+        
+        /* Touch improvements */
+        @media (hover: none) and (pointer: coarse) {
+            .app-card:hover {
+                transform: none;
+            }
+            
+            .app-card:active {
+                transform: scale(0.98);
+                transition: transform 0.1s ease;
+            }
+            
+            .add-app-btn:hover {
+                transform: none;
+            }
+            
+            .add-app-btn:active {
+                transform: scale(0.95);
+            }
+            
+            .btn:hover {
+                transform: none;
+            }
+            
+            .btn:active {
+                transform: scale(0.98);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>My Base44 Applications</h1>
+            <p>Quick access to your personal applications</p>
+        </div>
+        
+        <div class="apps-grid" id="appsGrid">
+            <!-- Apps will be dynamically generated here -->
+        </div>
+    </div>
+
+    <button class="add-app-btn" onclick="openModal()" title="Add New Application">
+        +
+    </button>
+
+    <div class="modal" id="addAppModal">
+        <div class="modal-content">
+            <h2>Add New Application</h2>
+            <form id="addAppForm">
+                <div class="form-group">
+                    <label for="appName">Application Name *</label>
+                    <input type="text" id="appName" required>
+                </div>
+                <div class="form-group">
+                    <label for="appUrl">URL *</label>
+                    <input type="url" id="appUrl" required>
+                </div>
+                <div class="form-group">
+                    <label for="appDescription">Description</label>
+                    <textarea id="appDescription" placeholder="Brief description of your application"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="appIcon">Icon (single character)</label>
+                    <input type="text" id="appIcon" maxlength="1" placeholder="📱">
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Application</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Application data storage
+        let applications = [
+            {
+                name: "Job Tracker",
+                url: "https://app--job-trackr-e29be248.base44.app",
+                description: "Track your job applications, interviews, and career progress",
+                icon: "💼"
+            },
+            {
+                name: "שומרי משקל",
+                url: "https://app---bf0a93d2.base44.app",
+                description: "שומרי משקל",
+                icon: "🚀"
+            }
+        ];
+
+        // Generate icon from first letter if no icon provided
+        function getAppIcon(app) {
+            if (app.icon) {
+                return app.icon;
+            }
+            return app.name.charAt(0).toUpperCase();
+        }
+
+        // Render applications
+        function renderApps() {
+            const grid = document.getElementById('appsGrid');
+            grid.innerHTML = '';
+            
+            applications.forEach(app => {
+                const appCard = document.createElement('a');
+                appCard.className = 'app-card';
+                appCard.href = app.url;
+                appCard.target = '_blank';
+                appCard.rel = 'noopener noreferrer';
+                
+                appCard.innerHTML = `
+                    <div class="app-icon">${getAppIcon(app)}</div>
+                    <div class="app-title">${app.name}</div>
+                    <div class="app-description">${app.description || 'No description available'}</div>
+                    <div class="app-url">${app.url}</div>
+                `;
+                
+                grid.appendChild(appCard);
+            });
+        }
+
+        // Modal functions
+        function openModal() {
+            document.getElementById('addAppModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('addAppModal').style.display = 'none';
+            document.getElementById('addAppForm').reset();
+        }
+
+        // Handle form submission
+        document.getElementById('addAppForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newApp = {
+                name: document.getElementById('appName').value,
+                url: document.getElementById('appUrl').value,
+                description: document.getElementById('appDescription').value,
+                icon: document.getElementById('appIcon').value
+            };
+            
+            applications.push(newApp);
+            renderApps();
+            closeModal();
+            
+            // Show success feedback on mobile
+            if (isMobile()) {
+                const successMsg = document.createElement('div');
+                successMsg.textContent = 'Application added successfully!';
+                successMsg.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: #4a5568;
+                    color: white;
+                    padding: 12px 20px;
+                    border-radius: 8px;
+                    z-index: 1001;
+                    font-size: 14px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                    border: 1px solid rgba(255,255,255,0.1);
+                `;
+                document.body.appendChild(successMsg);
+                setTimeout(() => successMsg.remove(), 3000);
+            }
+        });
+
+        // Handle escape key to close modal
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('addAppModal').style.display === 'block') {
+                closeModal();
+            }
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('addAppModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Mobile-specific improvements
+        function isMobile() {
+            return window.innerWidth <= 768;
+        }
+
+        // Handle mobile keyboard
+        if (isMobile()) {
+            // Auto-scroll to input when focused (helps with mobile keyboards)
+            document.querySelectorAll('input, textarea').forEach(input => {
+                input.addEventListener('focus', function() {
+                    setTimeout(() => {
+                        this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 300);
+                });
+            });
+
+            // Add haptic feedback for mobile (if supported)
+            function addHapticFeedback(element) {
+                element.addEventListener('touchstart', function() {
+                    if (navigator.vibrate) {
+                        navigator.vibrate(10);
+                    }
+                });
+            }
+
+            // Add haptic feedback to buttons
+            const buttons = document.querySelectorAll('.add-app-btn, .btn');
+            buttons.forEach(addHapticFeedback);
+        }
+
+        // Handle orientation changes
+        window.addEventListener('orientationchange', function() {
+            setTimeout(() => {
+                // Recalculate layout after orientation change
+                if (document.getElementById('addAppModal').style.display === 'block') {
+                    // Reposition modal if open
+                    const modal = document.querySelector('.modal-content');
+                    modal.style.transform = 'translate(-50%, -50%)';
+                }
+            }, 100);
+        });
+
+        // Prevent zoom on double-tap for app cards
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        // Initialize the page
+        renderApps();
+    </script>
 </body>
 </html>
